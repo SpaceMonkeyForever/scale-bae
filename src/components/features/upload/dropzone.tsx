@@ -86,7 +86,13 @@ export function Dropzone({ onFileSelect, isLoading }: DropzoneProps) {
         </div>
       ) : (
         <>
-          <div className="text-6xl mb-4">📷</div>
+          <Image
+            src="/unicorns/5.png"
+            alt=""
+            width={260}
+            height={260}
+            className="mb-4 animate-[float_3s_ease-in-out_infinite]"
+          />
           <h3 className="text-xl font-semibold text-bae-800 mb-2">
             Show me your progress, babe!
           </h3>
