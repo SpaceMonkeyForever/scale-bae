@@ -1,26 +1,103 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Primary Pink (bae) palette */
+  --color-bae-50: #FFF5F7;
+  --color-bae-100: #FFEBEF;
+  --color-bae-200: #FFD6E0;
+  --color-bae-300: #FFC2D1;
+  --color-bae-400: #FFADC2;
+  --color-bae-500: #FF85A1;
+  --color-bae-600: #FF6B8A;
+  --color-bae-700: #E84A6F;
+  --color-bae-800: #C13A5A;
+  --color-bae-900: #9A2D47;
+
+  /* Accent Lavender */
+  --color-lavender-50: #FAF5FF;
+  --color-lavender-100: #F3E8FF;
+  --color-lavender-200: #E9D5FF;
+  --color-lavender-300: #D8B4FE;
+  --color-lavender-400: #C084FC;
+  --color-lavender-500: #A855F7;
+
+  /* Cream neutrals */
+  --color-cream-50: #FFFBF7;
+  --color-cream-100: #FFF7F0;
+  --color-cream-200: #FFEEE0;
+  --color-cream-300: #FFE4CF;
+  --color-cream-400: #FFD4B3;
+
+  /* Mint success */
+  --color-mint-100: #D1FAE5;
+  --color-mint-500: #10B981;
+
+  /* Semantic colors */
+  --color-background: var(--color-bae-50);
+  --color-foreground: var(--color-bae-900);
+  --color-muted: var(--color-bae-800);
+  --color-primary: var(--color-bae-500);
+  --color-primary-hover: var(--color-bae-600);
+  --color-card: #ffffff;
+  --color-border: var(--color-bae-200);
+  --color-ring: var(--color-bae-500);
+
+  /* Fonts */
+  --font-sans: var(--font-geist-sans), system-ui, sans-serif;
+  --font-display: var(--font-poppins), system-ui, sans-serif;
+
+  /* Shadows */
+  --shadow-bae: 0 4px 14px 0 rgba(255, 133, 161, 0.25);
+  --shadow-bae-lg: 0 10px 40px 0 rgba(255, 133, 161, 0.3);
+
+  /* Border radius */
+  --radius-bae: 1rem;
+
+  /* Animations */
+  --animate-fade-in: fade-in 200ms ease-out;
+  --animate-slide-up: slide-up 200ms ease-out;
+  --animate-pulse-soft: pulse-soft 2s ease-in-out infinite;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+@keyframes fade-in {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes slide-up {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+:root {
+  --background: #FFF5F7;
+  --foreground: #9A2D47;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Focus visible styles for accessibility */
+:focus-visible {
+  outline: 2px solid var(--color-ring);
+  outline-offset: 2px;
 }

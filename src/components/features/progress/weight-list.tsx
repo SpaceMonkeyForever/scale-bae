@@ -1,0 +1,104 @@
+"use client";
+
+import { useState } from "react";
+import { formatRelativeDate } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+
+interface WeightEntry {
+  id: string;
+  weight: number;
+  unit: "lb" | "kg";
+  recordedAt: Date;
+  note?: string | null;
+}
+
+interface WeightListProps {
+  entries: WeightEntry[];
+  onDelete: (id: string) => Promise<void>;
+}
+
+export function WeightList({ entries, onDelete }: WeightListProps) {
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const handleDelete = async (id: string) => {
+    setDeletingId(id);
+    await onDelete(id);
+    setDeletingId(null);
+  };
+
+  if (entries.length === 0) {
+    return (
+      <div className="text-center py-8 text-bae-500">
+        No entries yet. Start logging your weight!
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-2">
+      {entries.map((entry, index) => {
+        const prevEntry = entries[index + 1];
+        const change = prevEntry ? entry.weight - prevEntry.weight : null;
+
+        return (
+          <div
+            key={entry.id}
+            className="flex items-center justify-between p-4 bg-white rounded-[var(--radius-bae)] border border-bae-100 hover:border-bae-200 transition-colors"
+          >
+            <div className="flex items-center gap-4">
+              <div className="text-lg font-semibold text-bae-700">
+                {entry.weight.toFixed(1)} {entry.unit}
+              </div>
+              {change !== null && (
+                <span
+                  className={cn(
+                    "text-sm font-medium",
+                    change < 0 ? "text-mint-500" : "text-bae-500"
+                  )}
+                >
+                  {change > 0 ? "+" : ""}
+                  {change.toFixed(1)}
+                </span>
+              )}
+            </div>
+
+            <div className="flex items-center gap-4">
+              <div className="text-sm text-bae-500">
+                {formatRelativeDate(entry.recordedAt)}
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleDelete(entry.id)}
+                disabled={deletingId === entry.id}
+                className="text-bae-400 hover:text-red-500 hover:bg-red-50"
+                aria-label={`Delete entry from ${formatRelativeDate(entry.recordedAt)}`}
+              >
+                {deletingId === entry.id ? (
+                  <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M3 6h18" />
+                    <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                    <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                  </svg>
+                )}
+              </Button>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
