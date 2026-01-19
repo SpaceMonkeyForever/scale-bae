@@ -174,8 +174,15 @@ export default function ConfirmPage() {
 
   if (!pendingWeight) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="w-8 h-8 rounded-full border-4 border-bae-200 border-t-bae-500 animate-spin" />
+      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+        <Image
+          src="/unicorns/1.png"
+          alt=""
+          width={120}
+          height={120}
+          className="animate-[float_3s_ease-in-out_infinite]"
+        />
+        <p className="text-bae-600 font-medium">Loading...</p>
       </div>
     );
   }
