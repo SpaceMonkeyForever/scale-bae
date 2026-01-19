@@ -91,7 +91,7 @@ export function Dropzone({ onFileSelect, isLoading }: DropzoneProps) {
             alt=""
             width={260}
             height={260}
-            className="mb-4 animate-[float_3s_ease-in-out_infinite]"
+            className="mb-4 animate-[float_3s_ease-in-out_infinite] pointer-events-none"
           />
           <h3 className="text-xl font-semibold text-bae-800 mb-2">
             Show me your progress, babe!
