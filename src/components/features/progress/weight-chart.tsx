@@ -32,7 +32,20 @@ export const WeightChart = forwardRef<HTMLDivElement, WeightChartProps>(
   const allValues = goalWeight ? [...weights, goalWeight] : weights;
   const minWeight = Math.min(...allValues);
   const maxWeight = Math.max(...allValues);
-  const padding = (maxWeight - minWeight) * 0.1 || 5;
+  const range = maxWeight - minWeight;
+  // Round domain to nice values (whole numbers or 0.5)
+  const roundToHalf = (n: number) => Math.round(n * 2) / 2;
+  const padding = Math.max(range * 0.1, 2);
+  const domainMin = roundToHalf(minWeight - padding);
+  const domainMax = roundToHalf(maxWeight + padding);
+
+  // Generate nice tick values (whole numbers or 0.5 increments)
+  const tickCount = 5;
+  const tickStep = roundToHalf((domainMax - domainMin) / (tickCount - 1)) || 1;
+  const ticks: number[] = [];
+  for (let t = domainMin; t <= domainMax + 0.01; t += tickStep) {
+    ticks.push(roundToHalf(t));
+  }
 
   if (data.length === 0) {
     return (
@@ -48,7 +61,7 @@ export const WeightChart = forwardRef<HTMLDivElement, WeightChartProps>(
       <ResponsiveContainer width="100%" height={300}>
         <LineChart
           data={chartData}
-          margin={{ top: 5, right: 20, left: 10, bottom: 5 }}
+          margin={{ top: 5, right: 80, left: 10, bottom: 5 }}
         >
           <CartesianGrid strokeDasharray="3 3" stroke="#FFD6E0" />
           <XAxis
@@ -61,7 +74,8 @@ export const WeightChart = forwardRef<HTMLDivElement, WeightChartProps>(
             stroke="#9A2D47"
             tick={{ fill: "#9A2D47", fontSize: 12 }}
             tickLine={{ stroke: "#FFD6E0" }}
-            domain={[minWeight - padding, maxWeight + padding]}
+            domain={[domainMin, domainMax]}
+            ticks={ticks}
             tickFormatter={(value) => `${value}`}
             width={50}
           />
@@ -87,7 +101,7 @@ export const WeightChart = forwardRef<HTMLDivElement, WeightChartProps>(
                 value: `Goal: ${goalWeight} ${unit}`,
                 fill: "#A855F7",
                 fontSize: 12,
-                position: "right",
+                position: "insideBottomRight",
               }}
             />
           )}
