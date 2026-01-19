@@ -24,7 +24,7 @@ export const sessionOptions: SessionOptions = {
   cookieName: "scale-bae-session",
   cookieOptions: {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: process.env.COOKIE_SECURE === "true",
     sameSite: "lax",
     maxAge: 60 * 60 * 24 * 7, // 1 week
   },
