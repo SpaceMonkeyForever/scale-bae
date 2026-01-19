@@ -4,6 +4,7 @@ import { useState } from "react";
 import { formatRelativeDate } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { UnlockedAchievement } from "@/lib/achievement-types";
 
 interface WeightEntry {
   id: string;
@@ -15,16 +16,30 @@ interface WeightEntry {
 
 interface WeightListProps {
   entries: WeightEntry[];
+  achievements?: UnlockedAchievement[];
   onDelete: (id: string) => Promise<void>;
 }
 
-export function WeightList({ entries, onDelete }: WeightListProps) {
+function isSameDay(date1: Date, date2: Date): boolean {
+  return (
+    date1.getFullYear() === date2.getFullYear() &&
+    date1.getMonth() === date2.getMonth() &&
+    date1.getDate() === date2.getDate()
+  );
+}
+
+export function WeightList({ entries, achievements = [], onDelete }: WeightListProps) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const handleDelete = async (id: string) => {
     setDeletingId(id);
     await onDelete(id);
     setDeletingId(null);
+  };
+
+  // Get achievements unlocked on a specific date
+  const getAchievementsForDate = (date: Date): UnlockedAchievement[] => {
+    return achievements.filter((a) => isSameDay(a.unlockedAt, date));
   };
 
   if (entries.length === 0) {
@@ -40,6 +55,7 @@ export function WeightList({ entries, onDelete }: WeightListProps) {
       {entries.map((entry, index) => {
         const prevEntry = entries[index + 1];
         const change = prevEntry ? entry.weight - prevEntry.weight : null;
+        const dayAchievements = getAchievementsForDate(entry.recordedAt);
 
         return (
           <div
@@ -60,6 +76,19 @@ export function WeightList({ entries, onDelete }: WeightListProps) {
                   {change > 0 ? "+" : ""}
                   {change.toFixed(1)}
                 </span>
+              )}
+              {dayAchievements.length > 0 && (
+                <div className="flex gap-1">
+                  {dayAchievements.map((a) => (
+                    <span
+                      key={a.type.id}
+                      title={a.type.name}
+                      className="text-base"
+                    >
+                      {a.type.emoji}
+                    </span>
+                  ))}
+                </div>
               )}
             </div>
 

@@ -219,6 +219,7 @@ export default function ProgressPage() {
               ...e,
               recordedAt: new Date(e.recordedAt),
             }))}
+            achievements={achievements}
             onDelete={handleDelete}
           />
         </CardContent>
