@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { WeightChart } from "@/components/features/progress/weight-chart";
 import { StatsSummary } from "@/components/features/progress/stats-summary";
 import { WeightList } from "@/components/features/progress/weight-list";
 import { GoalSetter } from "@/components/features/progress/goal-setter";
+import { ShareProgress } from "@/components/features/progress/share-progress";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
@@ -24,6 +25,7 @@ export default function ProgressPage() {
   const [goalWeight, setGoalWeight] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [timeRange, setTimeRange] = useState<TimeRange>("1m");
+  const chartRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchWeights();
@@ -131,11 +133,21 @@ export default function ProgressPage() {
         </Link>
       </div>
 
-      <GoalSetter
-        currentGoal={goalWeight}
-        unit={unit}
-        onSave={handleSaveGoal}
-      />
+      <div className="grid gap-4 sm:grid-cols-2">
+        <GoalSetter
+          currentGoal={goalWeight}
+          unit={unit}
+          onSave={handleSaveGoal}
+        />
+        <ShareProgress
+          chartRef={chartRef}
+          currentWeight={currentWeight}
+          startWeight={startWeight}
+          goalWeight={goalWeight ?? undefined}
+          unit={unit}
+          totalEntries={entries.length}
+        />
+      </div>
 
       <StatsSummary
         currentWeight={currentWeight}
@@ -165,7 +177,7 @@ export default function ProgressPage() {
           </div>
         </CardHeader>
         <CardContent>
-          <WeightChart data={chartData} unit={unit} />
+          <WeightChart ref={chartRef} data={chartData} unit={unit} goalWeight={goalWeight ?? undefined} />
         </CardContent>
       </Card>
 

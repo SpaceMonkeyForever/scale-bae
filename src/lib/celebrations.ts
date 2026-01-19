@@ -63,6 +63,8 @@ export function checkForCelebration(
       title: "You Did It!",
       message: `You've reached your goal of ${goalWeight} ${unit}! This is an incredible achievement. All your hard work and dedication has paid off. Time to celebrate and maybe set a new goal!`,
       unit,
+      currentWeight: newWeight,
+      goalWeight,
     };
   }
 
@@ -75,6 +77,8 @@ export function checkForCelebration(
       message: getRandomMessage(MILESTONE_MESSAGES),
       milestone,
       unit,
+      currentWeight: newWeight,
+      goalWeight: goalWeight ?? undefined,
     };
   }
 
@@ -89,6 +93,8 @@ export function checkForCelebration(
       message: `Wow, you lost ${formattedLoss} ${unit} since last time! ${getRandomMessage(ENCOURAGEMENT_MESSAGES)}`,
       weightLost,
       unit,
+      currentWeight: newWeight,
+      goalWeight: goalWeight ?? undefined,
     };
   }
 

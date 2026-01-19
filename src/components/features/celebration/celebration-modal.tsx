@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { Confetti } from "./confetti";
+import { ShareButton } from "./share-button";
 
 export interface CelebrationData {
   type: "weight_loss" | "milestone" | "goal_reached";
@@ -11,14 +12,17 @@ export interface CelebrationData {
   weightLost?: number;
   milestone?: number;
   unit: "lb" | "kg";
+  currentWeight?: number;
+  goalWeight?: number;
 }
 
 interface CelebrationModalProps {
   celebration: CelebrationData | null;
+  imageDataUrl?: string;
   onClose: () => void;
 }
 
-export function CelebrationModal({ celebration, onClose }: CelebrationModalProps) {
+export function CelebrationModal({ celebration, imageDataUrl, onClose }: CelebrationModalProps) {
   const isMilestone = celebration?.type === "milestone" || celebration?.type === "goal_reached";
 
   return (
@@ -103,7 +107,19 @@ export function CelebrationModal({ celebration, onClose }: CelebrationModalProps
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.6 }}
+                className="space-y-3"
               >
+                {celebration.currentWeight && (
+                  <ShareButton
+                    weight={celebration.currentWeight}
+                    unit={celebration.unit}
+                    imageDataUrl={imageDataUrl}
+                    celebrationType={celebration.type}
+                    milestone={celebration.milestone}
+                    goalWeight={celebration.goalWeight}
+                    className="w-full"
+                  />
+                )}
                 <Button onClick={onClose} className="w-full">
                   {celebration.type === "goal_reached" ? "Celebrate!" : "Keep Going!"}
                 </Button>

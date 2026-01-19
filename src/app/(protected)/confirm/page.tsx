@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { WeightDisplay } from "@/components/features/weight/weight-display";
 import { WeightEdit } from "@/components/features/weight/weight-edit";
 import { CelebrationModal, CelebrationData } from "@/components/features/celebration/celebration-modal";
+import { ShareButton } from "@/components/features/celebration/share-button";
 import { checkForCelebration } from "@/lib/celebrations";
 
 interface PendingWeight {
@@ -31,6 +32,7 @@ export default function ConfirmPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [note, setNote] = useState("");
   const [celebration, setCelebration] = useState<CelebrationData | null>(null);
+  const [savedWeight, setSavedWeight] = useState<{ weight: number; unit: "lb" | "kg"; imagePreview?: string } | null>(null);
 
   useEffect(() => {
     const stored = sessionStorage.getItem("pendingWeight");
@@ -83,6 +85,13 @@ export default function ConfirmPage() {
 
       sessionStorage.removeItem("pendingWeight");
 
+      // Save the weight info for the share button (including image)
+      setSavedWeight({
+        weight: pendingWeight.weight,
+        unit: pendingWeight.unit,
+        imagePreview: pendingWeight.imagePreview,
+      });
+
       // Check for celebration
       const celebrationData = checkForCelebration(
         pendingWeight.weight,
@@ -95,7 +104,8 @@ export default function ConfirmPage() {
         setCelebration(celebrationData);
         setIsSaving(false);
       } else {
-        router.push("/progress");
+        // No celebration, but still show the saved state with share option
+        setIsSaving(false);
       }
     } catch (error) {
       console.error("Save error:", error);
@@ -124,6 +134,38 @@ export default function ConfirmPage() {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="w-8 h-8 rounded-full border-4 border-bae-200 border-t-bae-500 animate-spin" />
+      </div>
+    );
+  }
+
+  // Show saved state with share option (when saved but no celebration)
+  if (savedWeight && !celebration) {
+    return (
+      <div className="max-w-md mx-auto">
+        <Card>
+          <CardHeader className="text-center">
+            <CardTitle>Weight Saved!</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6 text-center">
+            <div className="text-5xl">✓</div>
+            <div className="text-3xl font-bold text-bae-700">
+              {savedWeight.weight} {savedWeight.unit}
+            </div>
+            <p className="text-bae-600">Your weight has been logged.</p>
+
+            <div className="space-y-3">
+              <ShareButton
+                weight={savedWeight.weight}
+                unit={savedWeight.unit}
+                imageDataUrl={savedWeight.imagePreview}
+                className="w-full"
+              />
+              <Button onClick={() => router.push("/progress")} className="w-full">
+                View Progress
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -208,6 +250,7 @@ export default function ConfirmPage() {
 
       <CelebrationModal
         celebration={celebration}
+        imageDataUrl={savedWeight?.imagePreview}
         onClose={handleCelebrationClose}
       />
     </div>
