@@ -43,8 +43,9 @@ export function GoalSetter({ currentGoal, unit, onSave }: GoalSetterProps) {
             <Image
               src="/unicorns/2.png"
               alt=""
-              width={40}
-              height={40}
+              width={80}
+              height={80}
+              className="animate-[float_3s_ease-in-out_infinite]"
             />
             <div>
               <div className="text-sm font-medium text-lavender-600">Goal Weight</div>

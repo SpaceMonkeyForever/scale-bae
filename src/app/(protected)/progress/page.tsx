@@ -7,8 +7,10 @@ import { StatsSummary } from "@/components/features/progress/stats-summary";
 import { WeightList } from "@/components/features/progress/weight-list";
 import { GoalSetter } from "@/components/features/progress/goal-setter";
 import { ShareProgress } from "@/components/features/progress/share-progress";
+import { AchievementsDisplay } from "@/components/features/achievements/achievements-display";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { UnlockedAchievement, ACHIEVEMENT_TYPES } from "@/lib/achievement-types";
 
 interface WeightEntry {
   id: string;
@@ -23,6 +25,7 @@ type TimeRange = "1w" | "1m" | "3m" | "all";
 export default function ProgressPage() {
   const [entries, setEntries] = useState<WeightEntry[]>([]);
   const [goalWeight, setGoalWeight] = useState<number | null>(null);
+  const [achievements, setAchievements] = useState<UnlockedAchievement[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [timeRange, setTimeRange] = useState<TimeRange>("1m");
   const chartRef = useRef<HTMLDivElement>(null);
@@ -30,6 +33,7 @@ export default function ProgressPage() {
   useEffect(() => {
     fetchWeights();
     fetchPreferences();
+    fetchAchievements();
   }, []);
 
   const fetchWeights = async () => {
@@ -51,6 +55,20 @@ export default function ProgressPage() {
       setGoalWeight(data.preferences?.goalWeight || null);
     } catch (error) {
       console.error("Failed to fetch preferences:", error);
+    }
+  };
+
+  const fetchAchievements = async () => {
+    try {
+      const res = await fetch("/api/achievements");
+      const data = await res.json();
+      const mapped = (data.achievements || []).map((a: { type: { id: string }; unlockedAt: string }) => ({
+        type: ACHIEVEMENT_TYPES[a.type.id] || a.type,
+        unlockedAt: new Date(a.unlockedAt),
+      }));
+      setAchievements(mapped);
+    } catch (error) {
+      console.error("Failed to fetch achievements:", error);
     }
   };
 
@@ -156,6 +174,8 @@ export default function ProgressPage() {
         unit={unit}
         totalEntries={entries.length}
       />
+
+      <AchievementsDisplay unlockedAchievements={achievements} />
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">

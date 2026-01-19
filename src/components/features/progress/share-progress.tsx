@@ -137,9 +137,9 @@ export function ShareProgress({
           <Image
             src="/unicorns/3.png"
             alt=""
-            width={60}
-            height={60}
-            className="flex-shrink-0"
+            width={80}
+            height={80}
+            className="flex-shrink-0 animate-[float_3s_ease-in-out_infinite]"
           />
           <button
             onClick={handleShare}

@@ -80,7 +80,7 @@ export function Dropzone({ onFileSelect, isLoading }: DropzoneProps) {
             alt=""
             width={120}
             height={120}
-            className="animate-pulse"
+            className="animate-[float_3s_ease-in-out_infinite]"
           />
           <p className="text-bae-600 font-medium">Reading your scale...</p>
         </div>

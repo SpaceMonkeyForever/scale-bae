@@ -1,6 +1,6 @@
 import { eq, desc } from "drizzle-orm";
 import { db } from "./index";
-import { users, weights, userPreferences, NewUser, NewWeight } from "./schema";
+import { users, weights, userPreferences, achievements, NewUser, NewWeight, NewAchievement } from "./schema";
 
 // User queries
 export async function getUserByUsername(username: string) {
@@ -17,6 +17,14 @@ export async function getUserById(id: string) {
 
 export async function createUser(user: NewUser) {
   return db.insert(users).values(user).returning();
+}
+
+export async function updateUserDisplayName(userId: string, displayName: string | null) {
+  return db
+    .update(users)
+    .set({ displayName })
+    .where(eq(users.id, userId))
+    .returning();
 }
 
 // Weight queries
@@ -61,4 +69,15 @@ export async function upsertUserPreferences(
     .insert(userPreferences)
     .values({ userId, ...prefs })
     .returning();
+}
+
+// Achievement queries
+export async function getAchievementsByUserId(userId: string) {
+  return db.query.achievements.findMany({
+    where: eq(achievements.userId, userId),
+  });
+}
+
+export async function createAchievement(achievement: NewAchievement) {
+  return db.insert(achievements).values(achievement).returning();
 }

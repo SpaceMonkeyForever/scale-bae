@@ -4,6 +4,7 @@ import { sql } from "drizzle-orm";
 export const users = sqliteTable("users", {
   id: text("id").primaryKey(),
   username: text("username").notNull().unique(),
+  displayName: text("display_name"),
   passwordHash: text("password_hash").notNull(),
   createdAt: integer("created_at", { mode: "timestamp" })
     .notNull()
@@ -35,8 +36,21 @@ export const userPreferences = sqliteTable("user_preferences", {
   goalWeight: real("goal_weight"),
 });
 
+export const achievements = sqliteTable("achievements", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  type: text("type").notNull(),
+  unlockedAt: integer("unlocked_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(unixepoch())`),
+});
+
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 export type Weight = typeof weights.$inferSelect;
 export type NewWeight = typeof weights.$inferInsert;
 export type UserPreferences = typeof userPreferences.$inferSelect;
+export type Achievement = typeof achievements.$inferSelect;
+export type NewAchievement = typeof achievements.$inferInsert;

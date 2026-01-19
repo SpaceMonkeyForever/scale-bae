@@ -9,7 +9,9 @@ import { WeightDisplay } from "@/components/features/weight/weight-display";
 import { WeightEdit } from "@/components/features/weight/weight-edit";
 import { CelebrationModal, CelebrationData } from "@/components/features/celebration/celebration-modal";
 import { ShareButton } from "@/components/features/celebration/share-button";
+import { AchievementUnlockedModal } from "@/components/features/achievements/achievement-unlocked-modal";
 import { checkForCelebration } from "@/lib/celebrations";
+import { UnlockedAchievement, ACHIEVEMENT_TYPES } from "@/lib/achievement-types";
 
 interface PendingWeight {
   weight: number;
@@ -22,16 +24,18 @@ interface PendingWeight {
 interface UserData {
   previousWeight: number | null;
   goalWeight: number | null;
+  displayName: string | null;
 }
 
 export default function ConfirmPage() {
   const router = useRouter();
   const [pendingWeight, setPendingWeight] = useState<PendingWeight | null>(null);
-  const [userData, setUserData] = useState<UserData>({ previousWeight: null, goalWeight: null });
+  const [userData, setUserData] = useState<UserData>({ previousWeight: null, goalWeight: null, displayName: null });
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [note, setNote] = useState("");
   const [celebration, setCelebration] = useState<CelebrationData | null>(null);
+  const [pendingAchievements, setPendingAchievements] = useState<UnlockedAchievement[]>([]);
   const [savedWeight, setSavedWeight] = useState<{ weight: number; unit: "lb" | "kg"; imagePreview?: string } | null>(null);
 
   useEffect(() => {
@@ -46,16 +50,19 @@ export default function ConfirmPage() {
 
   const fetchUserData = async () => {
     try {
-      const [weightsRes, prefsRes] = await Promise.all([
+      const [weightsRes, prefsRes, userRes] = await Promise.all([
         fetch("/api/weights"),
         fetch("/api/preferences"),
+        fetch("/api/user"),
       ]);
       const weightsData = await weightsRes.json();
       const prefsData = await prefsRes.json();
+      const userData = await userRes.json();
 
       setUserData({
         previousWeight: weightsData.weights?.[0]?.weight || null,
         goalWeight: prefsData.preferences?.goalWeight || null,
+        displayName: userData.user?.displayName || null,
       });
     } catch (error) {
       console.error("Failed to fetch user data:", error);
@@ -92,21 +99,44 @@ export default function ConfirmPage() {
         imagePreview: pendingWeight.imagePreview,
       });
 
+      // Check for new achievements
+      const achievementsRes = await fetch("/api/achievements", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          weight: pendingWeight.weight,
+          unit: pendingWeight.unit,
+          goalWeight: userData.goalWeight,
+        }),
+      });
+      const achievementsData = await achievementsRes.json();
+      const newAchievements: UnlockedAchievement[] = (achievementsData.newAchievements || []).map(
+        (a: { type: { id: string }; unlockedAt: string }) => ({
+          type: ACHIEVEMENT_TYPES[a.type.id] || a.type,
+          unlockedAt: new Date(a.unlockedAt),
+        })
+      );
+
       // Check for celebration
       const celebrationData = checkForCelebration(
         pendingWeight.weight,
         pendingWeight.unit,
         userData.previousWeight,
-        userData.goalWeight
+        userData.goalWeight,
+        userData.displayName || undefined
       );
+
+      // Store achievements to show (after celebration if there is one)
+      setPendingAchievements(newAchievements);
 
       if (celebrationData) {
         setCelebration(celebrationData);
-        setIsSaving(false);
-      } else {
-        // No celebration, but still show the saved state with share option
-        setIsSaving(false);
+      } else if (newAchievements.length > 0) {
+        // No celebration, show first achievement directly
+        // (achievements will be shifted when modal closes)
       }
+      // Otherwise just show the "Weight Saved!" screen
+      setIsSaving(false);
     } catch (error) {
       console.error("Save error:", error);
       setIsSaving(false);
@@ -115,7 +145,19 @@ export default function ConfirmPage() {
 
   const handleCelebrationClose = () => {
     setCelebration(null);
-    router.push("/progress");
+    // If there are pending achievements, they'll show next
+    // Otherwise navigate to progress
+    if (pendingAchievements.length === 0) {
+      router.push("/progress");
+    }
+  };
+
+  const handleAchievementClose = () => {
+    // Remove the first achievement and show next one, or navigate away
+    setPendingAchievements((prev) => prev.slice(1));
+    if (pendingAchievements.length <= 1) {
+      router.push("/progress");
+    }
   };
 
   const handleEdit = (weight: number, unit: "lb" | "kg") => {
@@ -138,8 +180,8 @@ export default function ConfirmPage() {
     );
   }
 
-  // Show saved state with share option (when saved but no celebration)
-  if (savedWeight && !celebration) {
+  // Show saved state with share option (when saved but no celebration or achievement modal)
+  if (savedWeight && !celebration && pendingAchievements.length === 0) {
     return (
       <div className="max-w-md mx-auto">
         <Card>
@@ -152,7 +194,7 @@ export default function ConfirmPage() {
               alt=""
               width={100}
               height={100}
-              className="mx-auto"
+              className="mx-auto animate-[bounce-soft_2s_ease-in-out_infinite]"
             />
             <div className="text-3xl font-bold text-bae-700">
               {savedWeight.weight} {savedWeight.unit}
@@ -258,6 +300,11 @@ export default function ConfirmPage() {
         celebration={celebration}
         imageDataUrl={savedWeight?.imagePreview}
         onClose={handleCelebrationClose}
+      />
+
+      <AchievementUnlockedModal
+        achievement={!celebration && pendingAchievements.length > 0 ? pendingAchievements[0] : null}
+        onClose={handleAchievementClose}
       />
     </div>
   );

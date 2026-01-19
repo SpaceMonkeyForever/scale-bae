@@ -54,13 +54,16 @@ export function checkForCelebration(
   newWeight: number,
   unit: "lb" | "kg",
   previousWeight: number | null,
-  goalWeight: number | null
+  goalWeight: number | null,
+  displayName?: string
 ): CelebrationData | null {
+  const name = displayName || "babe";
+
   // Priority 1: Goal reached!
   if (goalWeight && newWeight <= goalWeight) {
     return {
       type: "goal_reached",
-      title: "You Did It!",
+      title: `You Did It, ${name}!`,
       message: `You've reached your goal of ${goalWeight} ${unit}! This is an incredible achievement. All your hard work and dedication has paid off. Time to celebrate and maybe set a new goal!`,
       unit,
       currentWeight: newWeight,
@@ -73,7 +76,7 @@ export function checkForCelebration(
   if (milestone) {
     return {
       type: "milestone",
-      title: "Milestone Reached!",
+      title: `Amazing, ${name}!`,
       message: getRandomMessage(MILESTONE_MESSAGES),
       milestone,
       unit,
@@ -89,7 +92,7 @@ export function checkForCelebration(
 
     return {
       type: "weight_loss",
-      title: "Nice Progress!",
+      title: `Nice Progress, ${name}!`,
       message: `Wow, you lost ${formattedLoss} ${unit} since last time! ${getRandomMessage(ENCOURAGEMENT_MESSAGES)}`,
       weightLost,
       unit,

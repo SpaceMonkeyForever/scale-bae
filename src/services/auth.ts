@@ -7,6 +7,7 @@ import { getUserByUsername, createUser } from "@/db/queries";
 export interface SessionData {
   userId?: string;
   username?: string;
+  displayName?: string;
   isLoggedIn: boolean;
 }
 
@@ -56,6 +57,7 @@ export async function login(username: string, password: string) {
   const session = await getSession();
   session.userId = user.id;
   session.username = user.username;
+  session.displayName = user.displayName || undefined;
   session.isLoggedIn = true;
   await session.save();
 
