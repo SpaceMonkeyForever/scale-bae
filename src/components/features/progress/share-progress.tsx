@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import html2canvas from "html2canvas";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -132,35 +133,44 @@ export function ShareProgress({
   return (
     <Card>
       <CardContent className="pt-6">
-        <button
-          onClick={handleShare}
-          disabled={isSharing || isDisabled}
-          className={cn(
-            "w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-[var(--radius-bae)] font-medium transition-all",
-            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-bae-500 focus-visible:ring-offset-2",
-            isDisabled
-              ? "bg-bae-100 text-bae-400 cursor-not-allowed"
-              : "bg-bae-500 text-white hover:bg-bae-600"
-          )}
-        >
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="w-5 h-5"
-            aria-hidden="true"
+        <div className="flex items-center gap-4">
+          <Image
+            src="/unicorns/3.png"
+            alt=""
+            width={60}
+            height={60}
+            className="flex-shrink-0"
+          />
+          <button
+            onClick={handleShare}
+            disabled={isSharing || isDisabled}
+            className={cn(
+              "flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-[var(--radius-bae)] font-medium transition-all",
+              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-bae-500 focus-visible:ring-offset-2",
+              isDisabled
+                ? "bg-bae-100 text-bae-400 cursor-not-allowed"
+                : "bg-bae-500 text-white hover:bg-bae-600"
+            )}
           >
-            <circle cx="18" cy="5" r="3" />
-            <circle cx="6" cy="12" r="3" />
-            <circle cx="18" cy="19" r="3" />
-            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
-            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
-          </svg>
-          {isSharing ? "Sharing..." : "Share Progress"}
-        </button>
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="w-5 h-5"
+              aria-hidden="true"
+            >
+              <circle cx="18" cy="5" r="3" />
+              <circle cx="6" cy="12" r="3" />
+              <circle cx="18" cy="19" r="3" />
+              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+              <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+            </svg>
+            {isSharing ? "Sharing..." : "Share Progress"}
+          </button>
+        </div>
         {isDisabled && (
           <p className="text-xs text-bae-500 text-center mt-2">
             Log your first weight to share

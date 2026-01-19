@@ -2,6 +2,9 @@
 
 A weight tracking web app where users upload photos of their scale, and Claude Vision extracts the weight via OCR.
 
+Follow guidlines here:
+https://vercel.com/design/guidelines
+
 ## Tech Stack
 
 - **Framework**: Next.js 16 with App Router, TypeScript

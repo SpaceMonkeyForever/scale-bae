@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -28,7 +29,12 @@ export function Header({ username }: HeaderProps) {
     <header className="sticky top-0 z-50 w-full border-b border-bae-200 bg-white/80 backdrop-blur-sm">
       <div className="container mx-auto flex h-16 items-center justify-between px-4 gap-2">
         <Link href="/upload" className="flex items-center gap-2 shrink-0">
-          <span className="text-2xl">💖</span>
+          <Image
+            src="/unicorns/1.png"
+            alt=""
+            width={32}
+            height={32}
+          />
           <span className="text-xl font-semibold text-bae-700 hidden sm:inline">
             scale-bae
           </span>

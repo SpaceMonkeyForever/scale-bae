@@ -147,7 +147,13 @@ export default function ConfirmPage() {
             <CardTitle>Weight Saved!</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6 text-center">
-            <div className="text-5xl">✓</div>
+            <Image
+              src="/unicorns/4.png"
+              alt=""
+              width={100}
+              height={100}
+              className="mx-auto"
+            />
             <div className="text-3xl font-bold text-bae-700">
               {savedWeight.weight} {savedWeight.unit}
             </div>

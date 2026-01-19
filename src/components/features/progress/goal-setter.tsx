@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -38,10 +39,18 @@ export function GoalSetter({ currentGoal, unit, onSave }: GoalSetterProps) {
     return (
       <Card className="p-4 bg-gradient-to-r from-lavender-100 to-bae-100 border-lavender-200">
         <div className="flex items-center justify-between">
-          <div>
-            <div className="text-sm font-medium text-lavender-600">Goal Weight</div>
-            <div className="text-xl font-bold text-bae-700">
-              {currentGoal ? `${currentGoal} ${unit}` : "Not set"}
+          <div className="flex items-center gap-3">
+            <Image
+              src="/unicorns/2.png"
+              alt=""
+              width={40}
+              height={40}
+            />
+            <div>
+              <div className="text-sm font-medium text-lavender-600">Goal Weight</div>
+              <div className="text-xl font-bold text-bae-700">
+                {currentGoal ? `${currentGoal} ${unit}` : "Not set"}
+              </div>
             </div>
           </div>
           <Button

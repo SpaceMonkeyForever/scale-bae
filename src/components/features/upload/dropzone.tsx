@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 interface DropzoneProps {
@@ -74,7 +75,13 @@ export function Dropzone({ onFileSelect, isLoading }: DropzoneProps) {
 
       {isLoading ? (
         <div className="flex flex-col items-center gap-4">
-          <div className="w-16 h-16 rounded-full border-4 border-bae-200 border-t-bae-500 animate-spin" />
+          <Image
+            src="/unicorns/1.png"
+            alt=""
+            width={120}
+            height={120}
+            className="animate-pulse"
+          />
           <p className="text-bae-600 font-medium">Reading your scale...</p>
         </div>
       ) : (
