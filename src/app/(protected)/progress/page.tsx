@@ -5,6 +5,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { WeightChart } from "@/components/features/progress/weight-chart";
 import { StatsSummary } from "@/components/features/progress/stats-summary";
 import { WeightList } from "@/components/features/progress/weight-list";
+import { GoalSetter } from "@/components/features/progress/goal-setter";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
@@ -20,11 +21,13 @@ type TimeRange = "1w" | "1m" | "3m" | "all";
 
 export default function ProgressPage() {
   const [entries, setEntries] = useState<WeightEntry[]>([]);
+  const [goalWeight, setGoalWeight] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [timeRange, setTimeRange] = useState<TimeRange>("1m");
 
   useEffect(() => {
     fetchWeights();
+    fetchPreferences();
   }, []);
 
   const fetchWeights = async () => {
@@ -37,6 +40,28 @@ export default function ProgressPage() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const fetchPreferences = async () => {
+    try {
+      const res = await fetch("/api/preferences");
+      const data = await res.json();
+      setGoalWeight(data.preferences?.goalWeight || null);
+    } catch (error) {
+      console.error("Failed to fetch preferences:", error);
+    }
+  };
+
+  const handleSaveGoal = async (goal: number | null) => {
+    const res = await fetch("/api/preferences", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ goalWeight: goal }),
+    });
+    if (!res.ok) {
+      throw new Error("Failed to save goal");
+    }
+    setGoalWeight(goal);
   };
 
   const handleDelete = async (id: string) => {
@@ -106,9 +131,16 @@ export default function ProgressPage() {
         </Link>
       </div>
 
+      <GoalSetter
+        currentGoal={goalWeight}
+        unit={unit}
+        onSave={handleSaveGoal}
+      />
+
       <StatsSummary
         currentWeight={currentWeight}
         startWeight={startWeight}
+        goalWeight={goalWeight ?? undefined}
         unit={unit}
         totalEntries={entries.length}
       />

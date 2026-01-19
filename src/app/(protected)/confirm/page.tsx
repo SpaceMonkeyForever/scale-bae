@@ -7,6 +7,8 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { WeightDisplay } from "@/components/features/weight/weight-display";
 import { WeightEdit } from "@/components/features/weight/weight-edit";
+import { CelebrationModal, CelebrationData } from "@/components/features/celebration/celebration-modal";
+import { checkForCelebration } from "@/lib/celebrations";
 
 interface PendingWeight {
   weight: number;
@@ -16,12 +18,19 @@ interface PendingWeight {
   imagePreview: string;
 }
 
+interface UserData {
+  previousWeight: number | null;
+  goalWeight: number | null;
+}
+
 export default function ConfirmPage() {
   const router = useRouter();
   const [pendingWeight, setPendingWeight] = useState<PendingWeight | null>(null);
+  const [userData, setUserData] = useState<UserData>({ previousWeight: null, goalWeight: null });
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [note, setNote] = useState("");
+  const [celebration, setCelebration] = useState<CelebrationData | null>(null);
 
   useEffect(() => {
     const stored = sessionStorage.getItem("pendingWeight");
@@ -30,7 +39,26 @@ export default function ConfirmPage() {
       return;
     }
     setPendingWeight(JSON.parse(stored));
+    fetchUserData();
   }, [router]);
+
+  const fetchUserData = async () => {
+    try {
+      const [weightsRes, prefsRes] = await Promise.all([
+        fetch("/api/weights"),
+        fetch("/api/preferences"),
+      ]);
+      const weightsData = await weightsRes.json();
+      const prefsData = await prefsRes.json();
+
+      setUserData({
+        previousWeight: weightsData.weights?.[0]?.weight || null,
+        goalWeight: prefsData.preferences?.goalWeight || null,
+      });
+    } catch (error) {
+      console.error("Failed to fetch user data:", error);
+    }
+  };
 
   const handleSave = async () => {
     if (!pendingWeight) return;
@@ -54,11 +82,30 @@ export default function ConfirmPage() {
       }
 
       sessionStorage.removeItem("pendingWeight");
-      router.push("/progress");
+
+      // Check for celebration
+      const celebrationData = checkForCelebration(
+        pendingWeight.weight,
+        pendingWeight.unit,
+        userData.previousWeight,
+        userData.goalWeight
+      );
+
+      if (celebrationData) {
+        setCelebration(celebrationData);
+        setIsSaving(false);
+      } else {
+        router.push("/progress");
+      }
     } catch (error) {
       console.error("Save error:", error);
       setIsSaving(false);
     }
+  };
+
+  const handleCelebrationClose = () => {
+    setCelebration(null);
+    router.push("/progress");
   };
 
   const handleEdit = (weight: number, unit: "lb" | "kg") => {
@@ -158,6 +205,11 @@ export default function ConfirmPage() {
           )}
         </CardContent>
       </Card>
+
+      <CelebrationModal
+        celebration={celebration}
+        onClose={handleCelebrationClose}
+      />
     </div>
   );
 }
