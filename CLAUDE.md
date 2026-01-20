@@ -52,7 +52,7 @@ src/
 │   │   └── admin/          # Admin API (users, activity logs)
 │   └── page.tsx            # Landing page (redirects)
 ├── components/
-│   ├── ui/                 # Button, Input, Card, Toast, Label
+│   ├── ui/                 # Button, Input, Card, Toast, Label, ConfirmModal
 │   ├── layout/             # Header
 │   └── features/
 │       ├── achievements/   # AchievementBadge, AchievementsDisplay, AchievementUnlockedModal
@@ -179,7 +179,9 @@ Admin dashboard at `/admin` for viewing all users and activity logs.
 - View all registered users
 - Filter activity by user
 - Track weight logs and progress page views
+- Delete users (with confirmation modal) - cascades to delete all associated data
 
 **API Endpoints** (403 for non-admins):
 - `GET /api/admin/users` - List all users
+- `DELETE /api/admin/users/[id]` - Delete a user (cannot delete self)
 - `GET /api/admin/activity?userId=` - List activity logs (optional user filter)
