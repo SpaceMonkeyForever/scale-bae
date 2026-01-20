@@ -36,6 +36,7 @@ export function WeightEdit({
         <Label htmlFor="weight">Weight</Label>
         <Input
           id="weight"
+          data-testid="weight-input"
           type="number"
           step="0.1"
           min="0"
@@ -49,11 +50,12 @@ export function WeightEdit({
 
       <div className="space-y-2">
         <Label>Unit</Label>
-        <div className="flex gap-2">
+        <div data-testid="unit-select" className="flex gap-2">
           {(["lb", "kg"] as const).map((u) => (
             <button
               key={u}
               type="button"
+              data-testid={`unit-${u}`}
               onClick={() => setUnit(u)}
               className={cn(
                 "flex-1 py-3 rounded-[var(--radius-bae)] font-medium transition-colors",
@@ -70,10 +72,10 @@ export function WeightEdit({
       </div>
 
       <div className="flex gap-2">
-        <Button type="button" variant="secondary" onClick={onCancel} className="flex-1">
+        <Button type="button" variant="secondary" onClick={onCancel} className="flex-1" data-testid="edit-cancel-button">
           Cancel
         </Button>
-        <Button type="submit" className="flex-1">
+        <Button type="submit" className="flex-1" data-testid="edit-save-button">
           Save
         </Button>
       </div>

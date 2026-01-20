@@ -16,6 +16,7 @@ https://vercel.com/design/guidelines
 - **UI Primitives**: Radix UI (dialog, dropdown, toast, label)
 - **Animations**: Motion (framer-motion)
 - **Visual Testing**: Puppeteer + jest-image-snapshot
+- **E2E Testing**: Puppeteer + Jest
 
 ## Commands
 
@@ -28,6 +29,9 @@ npm run db:generate  # Generate Drizzle migrations
 npm run db:push      # Push schema to database
 npm run db:studio    # Open Drizzle Studio (database GUI)
 npm run test:visual  # Run Puppeteer visual tests
+npm run test:e2e     # Run Puppeteer E2E tests
+npm run test:e2e:headed  # Run E2E tests with visible browser
+npm run test:e2e:debug   # Run E2E tests with slow motion
 npm run view         # Open app in Puppeteer and take screenshots
 ```
 
@@ -134,6 +138,14 @@ npm run view                   # Takes screenshots
 npm run test:visual            # Runs visual regression tests
 ```
 
+### Run E2E tests
+```bash
+npm run dev                    # Dev server must be running
+npm run test:e2e               # Run all E2E tests
+npm run test:e2e:headed        # Run with visible browser
+npm run test:e2e:debug         # Run with slow motion for debugging
+```
+
 ## Features
 
 ### Display Name
@@ -185,3 +197,54 @@ Admin dashboard at `/admin` for viewing all users and activity logs.
 - `GET /api/admin/users` - List all users
 - `DELETE /api/admin/users/[id]` - Delete a user (cannot delete self)
 - `GET /api/admin/activity?userId=` - List activity logs (optional user filter)
+
+## E2E Testing
+
+Comprehensive Puppeteer E2E test suite for regression testing.
+
+### Test Structure
+
+```
+tests/e2e/
+├── setup/
+│   ├── browser.ts        # Browser launch, viewport helpers, delay()
+│   ├── database.ts       # Direct SQLite helpers (create users, seed weights)
+│   ├── test-data.ts      # Test fixtures and factories
+│   └── mock-ocr.ts       # OCR mocking via sessionStorage
+├── helpers/
+│   ├── auth.helpers.ts   # Login, register, logout helpers
+│   ├── navigation.helpers.ts  # Navigation utilities
+│   └── selectors.ts      # Centralized data-testid selectors
+└── suites/
+    ├── auth.test.ts           # Registration, login, session, logout
+    ├── weight-logging.test.ts # Upload, confirm, edit, save, delete
+    ├── achievements.test.ts   # Achievement unlock tests
+    ├── celebrations.test.ts   # Celebration modal tests
+    ├── progress.test.ts       # Chart, stats, history, goal setting
+    └── admin.test.ts          # Admin access, user management
+```
+
+### Key Patterns
+
+**OCR Mocking**: Since OCR requires Claude Vision API, tests use sessionStorage bypass:
+```typescript
+await setPendingWeight(page, 175, "lb", "high");
+await navigateTo(page, "/confirm");
+```
+
+**Database Seeding**: Direct SQLite access for test setup:
+```typescript
+const userId = await createTestUser(username, password);
+await seedWeightEntries(userId, [
+  { weight: 180, unit: "lb", daysAgo: 7 },
+  { weight: 178, unit: "lb", daysAgo: 0 },
+]);
+```
+
+**Selectors**: Uses `data-testid` attributes for reliable element selection. Key components have testids like `weight-display`, `save-button`, `weight-list-item`.
+
+### Configuration
+
+- **Timeout**: 60s per test (E2E tests need more time)
+- **Serial Execution**: `maxWorkers: 1` to avoid database conflicts
+- **Bail on Failure**: Stops on first failure in dev (not CI)

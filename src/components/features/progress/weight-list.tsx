@@ -45,14 +45,14 @@ export function WeightList({ entries, achievements = [], onDelete }: WeightListP
 
   if (entries.length === 0) {
     return (
-      <div className="text-center py-8 text-bae-500">
+      <div data-testid="weight-list" className="text-center py-8 text-bae-500">
         No entries yet. Start logging your weight!
       </div>
     );
   }
 
   return (
-    <div className="space-y-2">
+    <div data-testid="weight-list" className="space-y-2">
       {entries.map((entry, index) => {
         const prevEntry = entries[index + 1];
         const change = prevEntry ? entry.weight - prevEntry.weight : null;
@@ -61,6 +61,7 @@ export function WeightList({ entries, achievements = [], onDelete }: WeightListP
         return (
           <div
             key={entry.id}
+            data-testid="weight-list-item"
             className="flex items-center justify-between p-4 bg-white rounded-[var(--radius-bae)] border border-bae-100 hover:border-bae-200 transition-colors"
           >
             <div className="flex items-center gap-4">
@@ -102,6 +103,7 @@ export function WeightList({ entries, achievements = [], onDelete }: WeightListP
               <Button
                 variant="ghost"
                 size="sm"
+                data-testid="delete-weight-button"
                 onClick={() => handleDelete(entry.id)}
                 disabled={deletingId === entry.id}
                 className="text-bae-400 hover:text-red-500 hover:bg-red-50"

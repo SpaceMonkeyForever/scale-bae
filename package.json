@@ -12,6 +12,9 @@
     "db:studio": "drizzle-kit studio",
     "test:visual": "jest --config jest.visual.config.js",
     "test:visual:update": "jest --config jest.visual.config.js --updateSnapshot",
+    "test:e2e": "jest --config jest.e2e.config.js",
+    "test:e2e:headed": "HEADLESS=false jest --config jest.e2e.config.js",
+    "test:e2e:debug": "HEADLESS=false SLOW_MO=100 jest --config jest.e2e.config.js",
     "view": "npx tsx scripts/view-app.ts"
   },
   "dependencies": {

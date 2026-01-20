@@ -37,7 +37,7 @@ export function GoalSetter({ currentGoal, unit, onSave }: GoalSetterProps) {
 
   if (!isEditing) {
     return (
-      <Card className="bg-gradient-to-r from-lavender-100 to-bae-100 border-lavender-200">
+      <Card data-testid="goal-setter" className="bg-gradient-to-r from-lavender-100 to-bae-100 border-lavender-200">
         <CardContent className="pt-6">
           <div className="flex items-center gap-4">
             <Image
@@ -69,12 +69,13 @@ export function GoalSetter({ currentGoal, unit, onSave }: GoalSetterProps) {
   }
 
   return (
-    <Card className="p-4 bg-gradient-to-r from-lavender-100 to-bae-100 border-lavender-200">
+    <Card data-testid="goal-setter-modal" className="p-4 bg-gradient-to-r from-lavender-100 to-bae-100 border-lavender-200">
       <div className="space-y-3">
         <div className="text-sm font-medium text-lavender-600">Set Your Goal Weight</div>
         <div className="flex items-center gap-2">
           <Input
             type="number"
+            data-testid="goal-input"
             value={goalValue}
             onChange={(e) => setGoalValue(e.target.value)}
             placeholder="Enter goal weight"
@@ -88,6 +89,7 @@ export function GoalSetter({ currentGoal, unit, onSave }: GoalSetterProps) {
         <div className="flex gap-2">
           <Button
             size="sm"
+            data-testid="goal-save-button"
             onClick={handleSave}
             disabled={isSaving}
           >

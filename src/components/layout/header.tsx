@@ -87,6 +87,7 @@ export function Header({ username, displayName }: HeaderProps) {
           {greeting && (
             <div className="relative">
               <button
+                data-testid="user-menu-button"
                 onClick={() => setIsEditing(!isEditing)}
                 className={cn(
                   "text-sm text-bae-600 hidden md:inline truncate max-w-[150px]",
@@ -94,7 +95,7 @@ export function Header({ username, displayName }: HeaderProps) {
                   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-bae-500 rounded"
                 )}
               >
-                Hey, {greeting}!
+                <span data-testid="display-name">Hey, {greeting}!</span>
               </button>
               {isEditing && (
                 <DisplayNameEditor
@@ -105,7 +106,7 @@ export function Header({ username, displayName }: HeaderProps) {
               )}
             </div>
           )}
-          <Button variant="ghost" size="sm" onClick={handleLogout}>
+          <Button data-testid="logout-button" variant="ghost" size="sm" onClick={handleLogout}>
             Logout
           </Button>
         </div>

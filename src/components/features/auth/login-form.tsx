@@ -110,6 +110,7 @@ export function LoginForm() {
             className="w-full"
             size="lg"
             isLoading={isLoading}
+            data-testid="auth-submit"
           >
             {isRegister ? "Create Account" : "Sign In"}
           </Button>
@@ -123,6 +124,7 @@ export function LoginForm() {
                 setIsRegister(!isRegister);
                 setError("");
               }}
+              data-testid={isRegister ? "switch-to-login" : "switch-to-register"}
             >
               {isRegister ? "Sign in" : "Create one"}
             </button>

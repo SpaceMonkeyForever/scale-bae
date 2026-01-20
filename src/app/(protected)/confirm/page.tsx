@@ -260,6 +260,7 @@ export default function ConfirmPage() {
 
               <button
                 onClick={() => setIsEditing(true)}
+                data-testid="edit-weight-button"
                 className="w-full text-center text-bae-600 text-sm hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-bae-500 rounded"
               >
                 Not right? Edit manually
@@ -287,6 +288,7 @@ export default function ConfirmPage() {
                   variant="secondary"
                   onClick={handleCancel}
                   className="flex-1"
+                  data-testid="cancel-button"
                 >
                   Cancel
                 </Button>
@@ -294,6 +296,7 @@ export default function ConfirmPage() {
                   onClick={handleSave}
                   isLoading={isSaving}
                   className="flex-1"
+                  data-testid="save-button"
                 >
                   Save
                 </Button>

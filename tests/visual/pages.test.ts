@@ -56,7 +56,7 @@ describe("Scale-Bae Visual Tests", () => {
       await page!.waitForSelector('input[id="username"]');
 
       // Click "Create one" to switch to register mode
-      await page!.click('button:has-text("Create one")');
+      await page!.click('[data-testid="switch-to-register"]');
 
       await page!.type('input[id="username"]', "testuser");
       await page!.type('input[id="password"]', "testpass123");

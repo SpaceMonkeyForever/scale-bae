@@ -30,6 +30,7 @@ export function AchievementUnlockedModal({
 
         {/* Modal */}
         <motion.div
+          data-testid="achievement-modal"
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.8, opacity: 0 }}
@@ -88,7 +89,7 @@ export function AchievementUnlockedModal({
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6 }}
           >
-            <Button onClick={onClose} className="w-full">
+            <Button data-testid="achievement-close" onClick={onClose} className="w-full">
               Awesome!
             </Button>
           </motion.div>

@@ -73,6 +73,7 @@ export function ConfirmModal({
       <div
         ref={modalRef}
         tabIndex={-1}
+        data-testid="confirm-modal"
         className={cn(
           "relative bg-white rounded-[var(--radius-bae)] shadow-bae-lg max-w-md w-full p-6",
           "animate-[scale-in_150ms_ease-out]"
@@ -92,6 +93,7 @@ export function ConfirmModal({
         <div className="flex gap-3 justify-end">
           <Button
             variant="secondary"
+            data-testid="confirm-modal-cancel"
             onClick={onCancel}
             disabled={isLoading}
           >
@@ -99,6 +101,7 @@ export function ConfirmModal({
           </Button>
           <Button
             variant={variant === "danger" ? "danger" : "primary"}
+            data-testid="confirm-modal-confirm"
             onClick={onConfirm}
             isLoading={isLoading}
           >

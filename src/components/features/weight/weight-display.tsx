@@ -16,13 +16,14 @@ export function WeightDisplay({
   className,
 }: WeightDisplayProps) {
   return (
-    <div className={cn("text-center", className)}>
-      <div className="text-7xl font-bold text-bae-700 animate-[slide-up_200ms_ease-out]">
+    <div data-testid="weight-display" className={cn("text-center", className)}>
+      <div data-testid="weight-value" className="text-7xl font-bold text-bae-700 animate-[slide-up_200ms_ease-out]">
         {weight.toFixed(1)}
       </div>
       <div className="text-2xl text-bae-500 font-medium">{unit}</div>
       {confidence && (
         <div
+          data-testid="confidence-indicator"
           className={cn(
             "mt-2 inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium",
             confidence === "high" && "bg-mint-100 text-mint-500",

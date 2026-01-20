@@ -30,17 +30,20 @@ export function StatsSummary({
       label: "Current",
       value: currentWeight ? `${currentWeight.toFixed(1)} ${unit}` : "-",
       image: "/unicorns/scales.png",
+      testId: "current-weight",
     },
     {
       label: "Change",
       value: change !== null ? `${change > 0 ? "+" : ""}${change.toFixed(1)} ${unit}` : "-",
       image: "/unicorns/chart.png",
       color: change !== null ? (change < 0 ? "text-mint-500" : "text-bae-600") : undefined,
+      testId: "total-change",
     },
     {
       label: "Entries",
       value: totalEntries.toString(),
       image: "/unicorns/note.png",
+      testId: "total-entries",
     },
     {
       label: "Goal Progress",
@@ -49,13 +52,14 @@ export function StatsSummary({
           ? `${Math.min(100, Math.max(0, goalProgress)).toFixed(0)}%`
           : "-",
       image: "/unicorns/goal.png",
+      testId: "goal-progress",
     },
   ];
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+    <div data-testid="stats-summary" className="grid grid-cols-2 md:grid-cols-4 gap-3">
       {stats.map((stat) => (
-        <Card key={stat.label} className="p-3 text-center">
+        <Card key={stat.label} data-testid={stat.testId} className="p-3 text-center">
           <div className="h-28 flex items-center justify-center mb-2">
             <Image
               src={stat.image}

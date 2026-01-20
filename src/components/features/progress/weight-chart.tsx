@@ -49,7 +49,7 @@ export const WeightChart = forwardRef<HTMLDivElement, WeightChartProps>(
 
   if (data.length === 0) {
     return (
-      <div ref={ref} className="flex flex-col items-center justify-center h-[300px] text-bae-500">
+      <div ref={ref} data-testid="weight-chart" className="flex flex-col items-center justify-center h-[300px] text-bae-500">
         <div className="text-4xl mb-2">📊</div>
         <p>No data yet. Log your first weight!</p>
       </div>
@@ -57,7 +57,7 @@ export const WeightChart = forwardRef<HTMLDivElement, WeightChartProps>(
   }
 
   return (
-    <div ref={ref} className="bg-white p-2 rounded-lg">
+    <div ref={ref} data-testid="weight-chart" className="bg-white p-2 rounded-lg">
       <ResponsiveContainer width="100%" height={300}>
         <LineChart
           data={chartData}

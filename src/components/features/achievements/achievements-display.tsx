@@ -18,7 +18,7 @@ export function AchievementsDisplay({ unlockedAchievements }: AchievementsDispla
   };
 
   return (
-    <Card>
+    <Card data-testid="achievements-display">
       <CardHeader className="pb-2">
         <CardTitle className="text-lg flex items-center gap-2">
           <span>Achievements</span>

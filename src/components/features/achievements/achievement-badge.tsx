@@ -26,7 +26,7 @@ export function AchievementBadge({
   const imageSize = sizeMap[size];
 
   return (
-    <div className="flex flex-col items-center gap-1">
+    <div className="flex flex-col items-center gap-1" data-testid="achievement-badge">
       <div
         className={cn(
           "flex items-center justify-center rounded-full transition-all overflow-hidden",
