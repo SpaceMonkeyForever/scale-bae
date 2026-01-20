@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { formatRelativeDate, formatDateTime } from "@/lib/utils";
 
 interface User {
@@ -24,6 +26,8 @@ export default function AdminPage() {
   const [activityLogs, setActivityLogs] = useState<ActivityLog[]>([]);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [userToDelete, setUserToDelete] = useState<User | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     fetchUsers();
@@ -85,6 +89,33 @@ export default function AdminPage() {
     }
   };
 
+  const handleDeleteUser = async () => {
+    if (!userToDelete) return;
+
+    setIsDeleting(true);
+    try {
+      const res = await fetch(`/api/admin/users/${userToDelete.id}`, {
+        method: "DELETE",
+      });
+
+      if (res.ok) {
+        setUsers((prev) => prev.filter((u) => u.id !== userToDelete.id));
+        if (selectedUserId === userToDelete.id) {
+          setSelectedUserId(null);
+        }
+        fetchActivity();
+      } else {
+        const data = await res.json();
+        console.error("Failed to delete user:", data.error);
+      }
+    } catch (error) {
+      console.error("Failed to delete user:", error);
+    } finally {
+      setIsDeleting(false);
+      setUserToDelete(null);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -116,23 +147,53 @@ export default function AdminPage() {
                 <span className="font-medium">All Users</span>
               </button>
               {users.map((user) => (
-                <button
+                <div
                   key={user.id}
-                  onClick={() => setSelectedUserId(user.id)}
-                  className={`w-full text-left p-3 rounded-lg transition-colors ${
+                  className={`flex items-center gap-2 p-3 rounded-lg transition-colors ${
                     selectedUserId === user.id
                       ? "bg-bae-100 border-bae-300"
                       : "hover:bg-bae-50"
                   } border`}
                 >
-                  <div className="font-medium">
-                    {user.displayName || user.username}
-                  </div>
-                  <div className="text-sm text-bae-500">
-                    @{user.username} · Joined{" "}
-                    {formatRelativeDate(new Date(user.createdAt))}
-                  </div>
-                </button>
+                  <button
+                    onClick={() => setSelectedUserId(user.id)}
+                    className="flex-1 text-left"
+                  >
+                    <div className="font-medium">
+                      {user.displayName || user.username}
+                    </div>
+                    <div className="text-sm text-bae-500">
+                      @{user.username} · Joined{" "}
+                      {formatRelativeDate(new Date(user.createdAt))}
+                    </div>
+                  </button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setUserToDelete(user);
+                    }}
+                    className="text-bae-400 hover:text-red-500 hover:bg-red-50 shrink-0"
+                    aria-label={`Delete user ${user.username}`}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M3 6h18" />
+                      <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                      <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                    </svg>
+                  </Button>
+                </div>
               ))}
             </div>
           </CardContent>
@@ -193,6 +254,18 @@ export default function AdminPage() {
           </CardContent>
         </Card>
       </div>
+
+      <ConfirmModal
+        isOpen={userToDelete !== null}
+        title="Delete User"
+        message={`Are you sure you want to delete ${userToDelete?.displayName || userToDelete?.username}? This will permanently remove their account and all associated data (weights, achievements, activity logs).`}
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        variant="danger"
+        isLoading={isDeleting}
+        onConfirm={handleDeleteUser}
+        onCancel={() => setUserToDelete(null)}
+      />
     </div>
   );
 }

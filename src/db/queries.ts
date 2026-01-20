@@ -106,3 +106,7 @@ export async function getAllActivityLogs() {
     orderBy: [desc(activityLog.createdAt)],
   });
 }
+
+export async function deleteUser(userId: string) {
+  return db.delete(users).where(eq(users.id, userId)).returning();
+}
