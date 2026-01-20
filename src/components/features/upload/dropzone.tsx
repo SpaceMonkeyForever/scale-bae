@@ -87,7 +87,7 @@ export function Dropzone({ onFileSelect, isLoading }: DropzoneProps) {
       ) : (
         <>
           <Image
-            src="/unicorns/5.png"
+            src="/unicorns/camera.png"
             alt=""
             width={260}
             height={260}
