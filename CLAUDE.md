@@ -81,7 +81,8 @@ src/
     ├── achievement-types.ts # Achievement type definitions
     ├── celebrations.ts     # Celebration triggers (milestones, goals)
     ├── weekly-summary.ts   # Weekly summary logic (7-day streak celebrations)
-    └── admin.ts            # Admin username check
+    ├── admin.ts            # Admin username check
+    └── image-compression.ts # Client-side image compression before upload
 ```
 
 ## Database Schema
@@ -109,10 +110,11 @@ COOKIE_SECURE=true               # Set in production with HTTPS
 
 ### OCR Flow
 1. User uploads image to `/upload`
-2. Image converted to base64, sent to `/api/ocr`
-3. Claude Vision extracts weight, returns `{ weight, unit, confidence }`
-4. User confirms on `/confirm` page
-5. Weight saved via `/api/weights`
+2. Image compressed client-side (max 1920x1920, 85% JPEG quality) via `src/lib/image-compression.ts`
+3. Compressed image converted to base64, sent to `/api/ocr`
+4. Claude Vision extracts weight, returns `{ weight, unit, confidence }`
+5. User confirms on `/confirm` page
+6. Weight saved via `/api/weights`
 
 ### Theme
 Custom colors defined in `globals.css` using Tailwind v4's `@theme inline`:

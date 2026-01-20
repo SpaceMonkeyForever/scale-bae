@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Dropzone } from "@/components/features/upload/dropzone";
 import { ImagePreview } from "@/components/features/upload/image-preview";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { compressImage } from "@/lib/image-compression";
 
 interface OCRResult {
   success: boolean;
@@ -35,13 +36,20 @@ export default function UploadPage() {
     setError(null);
     setIsLoading(true);
 
-    // Create preview
+    // Create preview from original file
     const previewUrl = URL.createObjectURL(file);
     setPreview(previewUrl);
 
     try {
+      // Compress image before upload for better performance
+      const compressedFile = await compressImage(file, {
+        maxWidth: 1920,
+        maxHeight: 1920,
+        quality: 0.85,
+      });
+
       const formData = new FormData();
-      formData.append("image", file);
+      formData.append("image", compressedFile);
 
       const res = await fetch("/api/ocr", {
         method: "POST",
