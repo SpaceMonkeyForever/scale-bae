@@ -61,8 +61,9 @@ src/
 │   └── features/
 │       ├── achievements/   # AchievementBadge, AchievementsDisplay, AchievementUnlockedModal
 │       ├── auth/           # LoginForm
-│       ├── celebration/    # CelebrationModal, ShareButton
+│       ├── celebration/    # CelebrationModal, ShareButton, Confetti
 │       ├── progress/       # WeightChart, WeightList, StatsSummary, GoalSetter, ShareProgress
+│       ├── weekly-summary/ # WeeklySummaryModal
 │       ├── upload/         # Dropzone, ImagePreview
 │       ├── user/           # DisplayNameEditor
 │       └── weight/         # WeightDisplay, WeightEdit
@@ -79,6 +80,7 @@ src/
     ├── achievements.ts     # Achievement checking logic
     ├── achievement-types.ts # Achievement type definitions
     ├── celebrations.ts     # Celebration triggers (milestones, goals)
+    ├── weekly-summary.ts   # Weekly summary logic (7-day streak celebrations)
     └── admin.ts            # Admin username check
 ```
 
@@ -117,6 +119,27 @@ Custom colors defined in `globals.css` using Tailwind v4's `@theme inline`:
 - `bae-*`: Pink shades (primary)
 - `lavender-*`: Purple shades (accent)
 - `mint-*`: Green shades (success)
+
+### Animations
+The app uses Motion (framer-motion) for animations throughout:
+
+**Custom CSS keyframes** (in `globals.css`):
+- `float`: Gentle vertical bounce for unicorns
+- `wiggle`: Rotation oscillation for header logo hover
+- `bounce-soft`: Subtle scale animation
+- `shine`: Gradient sweep for achievement badges
+- `slide-up`, `fade-in`, `pulse-soft`: General utilities
+
+**Component animations**:
+- Stats cards: Staggered entrance (80ms between cards)
+- Weight list: Items slide in from left (50ms stagger)
+- Chart line: 800ms draw animation with ease-out
+- Achievement badges: Subtle shine sweep on unlocked badges
+- Progress page sections: Fade in on scroll (whileInView)
+- Buttons: 2% scale press feedback via CSS `active:scale-[0.98]`
+- Modals: Spring physics for entrance/exit
+
+All animations respect `prefers-reduced-motion` media query.
 
 ## Common Tasks
 
@@ -168,6 +191,23 @@ Modal celebrations trigger for:
 - Reaching goal weight
 - New lowest weight
 - Weight loss milestones (5kg, 10kg)
+
+### Weekly Summary
+Every 7 days since the user's first weight entry, a Weekly Summary modal appears with:
+- Week number (Week 1, Week 2, etc.)
+- Number of entries logged that week
+- Start/end weights with weekly change (if multiple entries exist)
+- Personalized encouragement quote using the user's display name
+- Different quote categories based on progress (good week, steady, challenging)
+
+Triggers at 7, 14, 21, 28 days since first entry, regardless of logging consistency.
+
+**Test with seed script:**
+```bash
+npx tsx scripts/seed-weekly-test.ts <username>
+# Creates entries starting 8 days ago
+# Then log one more weight to trigger the Week 1 summary modal
+```
 
 ### Sharing
 Web Share API integration for sharing progress (with fallback copy-to-clipboard).

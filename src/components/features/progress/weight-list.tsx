@@ -2,10 +2,28 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { motion } from "motion/react";
 import { formatRelativeDate } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { UnlockedAchievement } from "@/lib/achievement-types";
+
+const listVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.05 },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, x: -10 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: { duration: 0.2 },
+  },
+};
 
 interface WeightEntry {
   id: string;
@@ -52,15 +70,22 @@ export function WeightList({ entries, achievements = [], onDelete }: WeightListP
   }
 
   return (
-    <div data-testid="weight-list" className="space-y-2">
+    <motion.div
+      data-testid="weight-list"
+      className="space-y-2"
+      variants={listVariants}
+      initial="hidden"
+      animate="visible"
+    >
       {entries.map((entry, index) => {
         const prevEntry = entries[index + 1];
         const change = prevEntry ? entry.weight - prevEntry.weight : null;
         const dayAchievements = getAchievementsForDate(entry.recordedAt);
 
         return (
-          <div
+          <motion.div
             key={entry.id}
+            variants={itemVariants}
             data-testid="weight-list-item"
             className="flex items-center justify-between p-4 bg-white rounded-[var(--radius-bae)] border border-bae-100 hover:border-bae-200 transition-colors"
           >
@@ -130,9 +155,9 @@ export function WeightList({ entries, achievements = [], onDelete }: WeightListP
                 )}
               </Button>
             </div>
-          </div>
+          </motion.div>
         );
       })}
-    </div>
+    </motion.div>
   );
 }

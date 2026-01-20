@@ -1,8 +1,29 @@
 "use client";
 
 import Image from "next/image";
+import { motion } from "motion/react";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.08,
+    },
+  },
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 20, scale: 0.95 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { type: "spring" as const, damping: 20, stiffness: 300 },
+  },
+};
 
 interface StatsSummaryProps {
   currentWeight?: number;
@@ -57,25 +78,33 @@ export function StatsSummary({
   ];
 
   return (
-    <div data-testid="stats-summary" className="grid grid-cols-2 md:grid-cols-4 gap-3">
+    <motion.div
+      data-testid="stats-summary"
+      className="grid grid-cols-2 md:grid-cols-4 gap-3"
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+    >
       {stats.map((stat) => (
-        <Card key={stat.label} data-testid={stat.testId} className="p-3 text-center">
-          <div className="h-28 flex items-center justify-center mb-2">
-            <Image
-              src={stat.image}
-              width={220}
-              height={120}
-              alt=""
-              className="object-contain max-h-28"
-              priority
-            />
-          </div>
-          <div className={cn("text-xl font-bold text-bae-700", stat.color)}>
-            {stat.value}
-          </div>
-          <div className="text-sm text-bae-500">{stat.label}</div>
-        </Card>
+        <motion.div key={stat.label} variants={cardVariants}>
+          <Card data-testid={stat.testId} className="p-3 text-center h-full">
+            <div className="h-28 flex items-center justify-center mb-2">
+              <Image
+                src={stat.image}
+                width={220}
+                height={120}
+                alt=""
+                className="object-contain max-h-28"
+                priority
+              />
+            </div>
+            <div className={cn("text-xl font-bold text-bae-700", stat.color)}>
+              {stat.value}
+            </div>
+            <div className="text-sm text-bae-500">{stat.label}</div>
+          </Card>
+        </motion.div>
       ))}
-    </div>
+    </motion.div>
   );
 }

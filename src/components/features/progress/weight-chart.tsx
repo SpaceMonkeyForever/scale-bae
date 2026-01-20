@@ -112,7 +112,8 @@ export const WeightChart = forwardRef<HTMLDivElement, WeightChartProps>(
             strokeWidth={3}
             dot={{ fill: "#FF85A1", strokeWidth: 2, r: 4 }}
             activeDot={{ r: 6, fill: "#FF6B8A" }}
-            animationDuration={500}
+            animationDuration={800}
+            animationEasing="ease-out"
           />
         </LineChart>
       </ResponsiveContainer>

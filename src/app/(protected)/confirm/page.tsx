@@ -10,7 +10,9 @@ import { WeightEdit } from "@/components/features/weight/weight-edit";
 import { CelebrationModal, CelebrationData } from "@/components/features/celebration/celebration-modal";
 import { ShareButton } from "@/components/features/celebration/share-button";
 import { AchievementUnlockedModal } from "@/components/features/achievements/achievement-unlocked-modal";
+import { WeeklySummaryModal } from "@/components/features/weekly-summary/weekly-summary-modal";
 import { checkForCelebration } from "@/lib/celebrations";
+import { checkForWeeklySummary, WeeklySummaryData } from "@/lib/weekly-summary";
 import { UnlockedAchievement, ACHIEVEMENT_TYPES } from "@/lib/achievement-types";
 
 interface PendingWeight {
@@ -35,6 +37,7 @@ export default function ConfirmPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [note, setNote] = useState("");
   const [celebration, setCelebration] = useState<CelebrationData | null>(null);
+  const [weeklySummary, setWeeklySummary] = useState<WeeklySummaryData | null>(null);
   const [pendingAchievements, setPendingAchievements] = useState<UnlockedAchievement[]>([]);
   const [savedWeight, setSavedWeight] = useState<{ weight: number; unit: "lb" | "kg"; imagePreview?: string } | null>(null);
 
@@ -129,12 +132,30 @@ export default function ConfirmPage() {
       // Store achievements to show (after celebration if there is one)
       setPendingAchievements(newAchievements);
 
+      // Fetch updated weights to check for weekly summary
+      const updatedWeightsRes = await fetch("/api/weights");
+      const updatedWeightsData = await updatedWeightsRes.json();
+      const weights = updatedWeightsData.weights || [];
+
+      // Check for weekly summary (every 7 days since first entry)
+      const weeklySummaryData = checkForWeeklySummary({
+        weights: weights.map((w: { weight: number; unit: "lb" | "kg"; recordedAt: string }) => ({
+          weight: w.weight,
+          unit: w.unit,
+          recordedAt: new Date(w.recordedAt),
+        })),
+        displayName: userData.displayName || undefined,
+        lastWeeklySummaryWeek: 0, // For now, always check. Could persist this in preferences later.
+      });
+
       if (celebrationData) {
         setCelebration(celebrationData);
-      } else if (newAchievements.length > 0) {
-        // No celebration, show first achievement directly
-        // (achievements will be shifted when modal closes)
       }
+
+      if (weeklySummaryData) {
+        setWeeklySummary(weeklySummaryData);
+      }
+
       // Otherwise just show the "Weight Saved!" screen
       setIsSaving(false);
     } catch (error) {
@@ -145,6 +166,15 @@ export default function ConfirmPage() {
 
   const handleCelebrationClose = () => {
     setCelebration(null);
+    // If there's a weekly summary, it shows next
+    // Then achievements, then navigate to progress
+    if (!weeklySummary && pendingAchievements.length === 0) {
+      router.push("/progress");
+    }
+  };
+
+  const handleWeeklySummaryClose = () => {
+    setWeeklySummary(null);
     // If there are pending achievements, they'll show next
     // Otherwise navigate to progress
     if (pendingAchievements.length === 0) {
@@ -187,8 +217,8 @@ export default function ConfirmPage() {
     );
   }
 
-  // Show saved state with share option (when saved but no celebration or achievement modal)
-  if (savedWeight && !celebration && pendingAchievements.length === 0) {
+  // Show saved state with share option (when saved but no modals to show)
+  if (savedWeight && !celebration && !weeklySummary && pendingAchievements.length === 0) {
     return (
       <div className="max-w-md mx-auto">
         <Card>
@@ -312,8 +342,13 @@ export default function ConfirmPage() {
         onClose={handleCelebrationClose}
       />
 
+      <WeeklySummaryModal
+        summary={!celebration ? weeklySummary : null}
+        onClose={handleWeeklySummaryClose}
+      />
+
       <AchievementUnlockedModal
-        achievement={!celebration && pendingAchievements.length > 0 ? pendingAchievements[0] : null}
+        achievement={!celebration && !weeklySummary && pendingAchievements.length > 0 ? pendingAchievements[0] : null}
         onClose={handleAchievementClose}
       />
     </div>

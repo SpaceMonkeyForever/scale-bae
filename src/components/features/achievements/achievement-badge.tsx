@@ -29,7 +29,7 @@ export function AchievementBadge({
     <div className="flex flex-col items-center gap-1" data-testid="achievement-badge">
       <div
         className={cn(
-          "flex items-center justify-center rounded-full transition-all overflow-hidden",
+          "relative flex items-center justify-center rounded-full transition-all overflow-hidden",
           size === "sm" && "w-16 h-16",
           size === "md" && "w-20 h-20",
           size === "lg" && "w-24 h-24",
@@ -46,6 +46,13 @@ export function AchievementBadge({
           height={imageSize}
           className={cn("object-cover", !unlocked && "opacity-50")}
         />
+        {/* Shine effect for unlocked badges */}
+        {unlocked && (
+          <div
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-[shine_3s_ease-in-out_infinite]"
+            aria-hidden="true"
+          />
+        )}
       </div>
       <span
         className={cn(

@@ -28,7 +28,11 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         disabled={disabled || isLoading}
         className={cn(
           // Base styles
-          "inline-flex items-center justify-center font-medium transition-colors duration-200 rounded-[var(--radius-bae)]",
+          "inline-flex items-center justify-center font-medium rounded-[var(--radius-bae)]",
+          // Transitions including transform for press feedback
+          "transition-all duration-200",
+          // Press feedback - scale down slightly on active
+          "active:scale-[0.98]",
           // Focus styles (visible outline)
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-bae-500 focus-visible:ring-offset-2",
           // Disabled styles

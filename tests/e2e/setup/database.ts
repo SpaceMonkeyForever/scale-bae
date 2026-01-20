@@ -56,10 +56,16 @@ export async function seedWeightEntries(
   try {
     for (const entry of entries) {
       const id = randomUUID();
+      // Calculate Unix timestamp for daysAgo
+      const date = new Date();
+      date.setDate(date.getDate() - entry.daysAgo);
+      date.setHours(9, 0, 0, 0); // Set to 9 AM for consistency
+      const unixTimestamp = Math.floor(date.getTime() / 1000);
+
       db.prepare(
         `
         INSERT INTO weights (id, user_id, weight, unit, note, recorded_at, created_at)
-        VALUES (?, ?, ?, ?, ?, datetime('now', ?), datetime('now'))
+        VALUES (?, ?, ?, ?, ?, ?, ?)
       `
       ).run(
         id,
@@ -67,7 +73,8 @@ export async function seedWeightEntries(
         entry.weight,
         entry.unit,
         entry.note || null,
-        `-${entry.daysAgo} days`
+        unixTimestamp,
+        unixTimestamp
       );
     }
   } finally {

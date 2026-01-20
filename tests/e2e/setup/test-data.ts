@@ -34,6 +34,22 @@ export const WEIGHT_FIXTURES = {
       daysAgo: 5 - i,
     })),
 
+  // 6 consecutive days for weekly summary testing (user logs 7th)
+  weeklySummarySetup: (startWeight: number) =>
+    Array.from({ length: 6 }, (_, i) => ({
+      weight: startWeight - i * 0.3,
+      unit: "lb" as const,
+      daysAgo: 6 - i, // Days 6, 5, 4, 3, 2, 1 (user logs day 0)
+    })),
+
+  // 13 consecutive days for week 2 testing (user logs 14th)
+  twoWeekSummarySetup: (startWeight: number) =>
+    Array.from({ length: 13 }, (_, i) => ({
+      weight: startWeight - i * 0.2,
+      unit: "lb" as const,
+      daysAgo: 13 - i,
+    })),
+
   // 10 entries for "Dedicated" achievement
   tenEntries: (startWeight: number) =>
     Array.from({ length: 10 }, (_, i) => ({

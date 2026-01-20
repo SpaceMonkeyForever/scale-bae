@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
+import { motion } from "motion/react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { WeightChart } from "@/components/features/progress/weight-chart";
 import { StatsSummary } from "@/components/features/progress/stats-summary";
@@ -12,6 +13,15 @@ import { AchievementsDisplay } from "@/components/features/achievements/achievem
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { UnlockedAchievement, ACHIEVEMENT_TYPES } from "@/lib/achievement-types";
+
+const sectionVariants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.4, ease: "easeOut" as const },
+  },
+};
 
 interface WeightEntry {
   id: string;
@@ -168,7 +178,13 @@ export default function ProgressPage() {
         </Link>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <motion.div
+        className="grid gap-4 sm:grid-cols-2"
+        variants={sectionVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-50px" }}
+      >
         <GoalSetter
           currentGoal={goalWeight}
           unit={unit}
@@ -182,57 +198,85 @@ export default function ProgressPage() {
           unit={unit}
           totalEntries={entries.length}
         />
-      </div>
+      </motion.div>
 
-      <StatsSummary
-        currentWeight={currentWeight}
-        startWeight={startWeight}
-        goalWeight={goalWeight ?? undefined}
-        unit={unit}
-        totalEntries={entries.length}
-      />
+      <motion.div
+        variants={sectionVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-50px" }}
+      >
+        <StatsSummary
+          currentWeight={currentWeight}
+          startWeight={startWeight}
+          goalWeight={goalWeight ?? undefined}
+          unit={unit}
+          totalEntries={entries.length}
+        />
+      </motion.div>
 
-      <AchievementsDisplay unlockedAchievements={achievements} />
+      <motion.div
+        variants={sectionVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-50px" }}
+      >
+        <AchievementsDisplay unlockedAchievements={achievements} />
+      </motion.div>
 
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>Weight Over Time</CardTitle>
-          <div className="flex gap-1">
-            {timeRanges.map((range) => (
-              <button
-                key={range.value}
-                onClick={() => setTimeRange(range.value)}
-                className={`px-3 py-1 text-sm rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-bae-500 ${
-                  timeRange === range.value
-                    ? "bg-bae-500 text-white"
-                    : "bg-bae-100 text-bae-600 hover:bg-bae-200"
-                }`}
-              >
-                {range.label}
-              </button>
-            ))}
-          </div>
-        </CardHeader>
-        <CardContent>
-          <WeightChart ref={chartRef} data={chartData} unit={unit} goalWeight={goalWeight ?? undefined} />
-        </CardContent>
-      </Card>
+      <motion.div
+        variants={sectionVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-50px" }}
+      >
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle>Weight Over Time</CardTitle>
+            <div className="flex gap-1">
+              {timeRanges.map((range) => (
+                <button
+                  key={range.value}
+                  onClick={() => setTimeRange(range.value)}
+                  className={`px-3 py-1 text-sm rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-bae-500 ${
+                    timeRange === range.value
+                      ? "bg-bae-500 text-white"
+                      : "bg-bae-100 text-bae-600 hover:bg-bae-200"
+                  }`}
+                >
+                  {range.label}
+                </button>
+              ))}
+            </div>
+          </CardHeader>
+          <CardContent>
+            <WeightChart ref={chartRef} data={chartData} unit={unit} goalWeight={goalWeight ?? undefined} />
+          </CardContent>
+        </Card>
+      </motion.div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>History</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <WeightList
-            entries={filteredEntries.map((e) => ({
-              ...e,
-              recordedAt: new Date(e.recordedAt),
-            }))}
-            achievements={achievements}
-            onDelete={handleDelete}
-          />
-        </CardContent>
-      </Card>
+      <motion.div
+        variants={sectionVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-50px" }}
+      >
+        <Card>
+          <CardHeader>
+            <CardTitle>History</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <WeightList
+              entries={filteredEntries.map((e) => ({
+                ...e,
+                recordedAt: new Date(e.recordedAt),
+              }))}
+              achievements={achievements}
+              onDelete={handleDelete}
+            />
+          </CardContent>
+        </Card>
+      </motion.div>
     </div>
   );
 }
