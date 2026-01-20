@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -51,12 +52,18 @@ export function LoginForm() {
   return (
     <Card className="w-full max-w-md animate-[slide-up_200ms_ease-out]">
       <CardHeader className="text-center">
-        <div className="text-5xl mb-2">💖</div>
+        <Image
+          src="/unicorns/1.png"
+          alt=""
+          width={160}
+          height={160}
+          className="mx-auto mb-2"
+        />
         <CardTitle className="text-3xl">scale-bae</CardTitle>
         <CardDescription>
           {isRegister
             ? "Create an account to start tracking"
-            : "Welcome back, gorgeous!"}
+            : "Welcome back!"}
         </CardDescription>
       </CardHeader>
       <CardContent>

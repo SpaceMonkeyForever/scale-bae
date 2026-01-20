@@ -7,9 +7,10 @@ import { cn } from "@/lib/utils";
 interface DropzoneProps {
   onFileSelect: (file: File) => void;
   isLoading?: boolean;
+  name?: string;
 }
 
-export function Dropzone({ onFileSelect, isLoading }: DropzoneProps) {
+export function Dropzone({ onFileSelect, isLoading, name }: DropzoneProps) {
   const [isDragging, setIsDragging] = useState(false);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
@@ -94,7 +95,7 @@ export function Dropzone({ onFileSelect, isLoading }: DropzoneProps) {
             className="mb-4 animate-[float_3s_ease-in-out_infinite] pointer-events-none"
           />
           <h3 className="text-xl font-semibold text-bae-800 mb-2">
-            Show me your progress, babe!
+            Show me your progress{name ? `, ${name}` : ""}!
           </h3>
           <p className="text-bae-600 text-center max-w-xs">
             Drop a photo of your scale here, or tap to take a picture

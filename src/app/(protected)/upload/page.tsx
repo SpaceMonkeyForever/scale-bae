@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Dropzone } from "@/components/features/upload/dropzone";
 import { ImagePreview } from "@/components/features/upload/image-preview";
@@ -20,6 +20,16 @@ export default function UploadPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [userName, setUserName] = useState<string | undefined>();
+
+  useEffect(() => {
+    fetch("/api/user")
+      .then((res) => res.json())
+      .then((data) => {
+        setUserName(data.user?.displayName || data.user?.username);
+      })
+      .catch(() => {});
+  }, []);
 
   const handleFileSelect = async (file: File) => {
     setError(null);
@@ -99,7 +109,7 @@ export default function UploadPage() {
           {preview && !isLoading ? (
             <ImagePreview src={preview} onRetake={handleRetake} />
           ) : (
-            <Dropzone onFileSelect={handleFileSelect} isLoading={isLoading} />
+            <Dropzone onFileSelect={handleFileSelect} isLoading={isLoading} name={userName} />
           )}
         </div>
       </Card>
