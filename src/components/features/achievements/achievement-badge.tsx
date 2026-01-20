@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { AchievementType } from "@/lib/achievement-types";
 
@@ -16,27 +17,35 @@ export function AchievementBadge({
   unlockedAt,
   size = "md",
 }: AchievementBadgeProps) {
-  const sizeClasses = {
-    sm: "w-12 h-12 text-xl",
-    md: "w-16 h-16 text-2xl",
-    lg: "w-20 h-20 text-3xl",
+  const sizeMap = {
+    sm: 64,
+    md: 80,
+    lg: 96,
   };
+
+  const imageSize = sizeMap[size];
 
   return (
     <div className="flex flex-col items-center gap-1">
       <div
         className={cn(
-          "flex items-center justify-center rounded-full transition-all",
-          sizeClasses[size],
+          "flex items-center justify-center rounded-full transition-all overflow-hidden",
+          size === "sm" && "w-16 h-16",
+          size === "md" && "w-20 h-20",
+          size === "lg" && "w-24 h-24",
           unlocked
             ? "bg-gradient-to-br from-lavender-100 to-bae-100 border-2 border-lavender-300 shadow-bae"
             : "bg-bae-100 border-2 border-bae-200 grayscale opacity-50"
         )}
         title={unlocked ? `Unlocked: ${achievement.description}` : `Locked: ${achievement.description}`}
       >
-        <span className={cn(!unlocked && "opacity-50")}>
-          {achievement.emoji}
-        </span>
+        <Image
+          src={achievement.image}
+          alt={achievement.name}
+          width={imageSize}
+          height={imageSize}
+          className={cn("object-cover", !unlocked && "opacity-50")}
+        />
       </div>
       <span
         className={cn(

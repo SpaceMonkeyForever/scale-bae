@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { formatRelativeDate } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -80,13 +81,15 @@ export function WeightList({ entries, achievements = [], onDelete }: WeightListP
               {dayAchievements.length > 0 && (
                 <div className="flex gap-1">
                   {dayAchievements.map((a) => (
-                    <span
+                    <Image
                       key={a.type.id}
+                      src={a.type.image}
+                      alt={a.type.name}
                       title={a.type.name}
-                      className="text-base"
-                    >
-                      {a.type.emoji}
-                    </span>
+                      width={24}
+                      height={24}
+                      className="rounded-full"
+                    />
                   ))}
                 </div>
               )}

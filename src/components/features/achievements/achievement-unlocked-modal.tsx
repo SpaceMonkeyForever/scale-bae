@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { motion, AnimatePresence } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { UnlockedAchievement } from "@/lib/achievement-types";
@@ -40,9 +41,15 @@ export function AchievementUnlockedModal({
             initial={{ scale: 0, rotate: -180 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{ delay: 0.2, type: "spring", damping: 10 }}
-            className="w-24 h-24 mx-auto mb-4 flex items-center justify-center bg-gradient-to-br from-lavender-200 to-bae-200 rounded-full border-4 border-lavender-300 shadow-lg"
+            className="w-24 h-24 mx-auto mb-4 flex items-center justify-center bg-gradient-to-br from-lavender-200 to-bae-200 rounded-full border-4 border-lavender-300 shadow-lg overflow-hidden"
           >
-            <span className="text-5xl">{achievement.type.emoji}</span>
+            <Image
+              src={achievement.type.image}
+              alt={achievement.type.name}
+              width={96}
+              height={96}
+              className="object-cover"
+            />
           </motion.div>
 
           {/* Title */}
