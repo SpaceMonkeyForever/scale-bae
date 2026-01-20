@@ -4,7 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 
 interface GoalSetterProps {
   currentGoal: number | null;
@@ -37,31 +37,33 @@ export function GoalSetter({ currentGoal, unit, onSave }: GoalSetterProps) {
 
   if (!isEditing) {
     return (
-      <Card className="p-4 bg-gradient-to-r from-lavender-100 to-bae-100 border-lavender-200">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
+      <Card className="bg-gradient-to-r from-lavender-100 to-bae-100 border-lavender-200">
+        <CardContent className="pt-6">
+          <div className="flex items-center gap-4">
             <Image
               src="/unicorns/2.png"
               alt=""
               width={80}
               height={80}
-              className="animate-[float_3s_ease-in-out_infinite]"
+              className="flex-shrink-0 animate-[float_3s_ease-in-out_infinite]"
             />
-            <div>
-              <div className="text-sm font-medium text-lavender-600">Goal Weight</div>
-              <div className="text-xl font-bold text-bae-700">
-                {currentGoal ? `${currentGoal} ${unit}` : "Not set"}
+            <div className="flex-1 flex items-center justify-between gap-3">
+              <div>
+                <div className="text-sm font-medium text-lavender-600">Goal Weight</div>
+                <div className="text-xl font-bold text-bae-700">
+                  {currentGoal ? `${currentGoal} ${unit}` : "Not set"}
+                </div>
               </div>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => setIsEditing(true)}
+              >
+                {currentGoal ? "Edit" : "Set Goal"}
+              </Button>
             </div>
           </div>
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => setIsEditing(true)}
-          >
-            {currentGoal ? "Edit" : "Set Goal"}
-          </Button>
-        </div>
+        </CardContent>
       </Card>
     );
   }
