@@ -14,6 +14,7 @@ https://vercel.com/design/guidelines
 - **OCR**: Claude Vision API (Anthropic SDK)
 - **Charts**: Recharts
 - **UI Primitives**: Radix UI (dialog, dropdown, toast, label)
+- **Animations**: Motion (framer-motion)
 - **Visual Testing**: Puppeteer + jest-image-snapshot
 
 ## Commands
@@ -51,27 +52,34 @@ src/
 │   ├── ui/                 # Button, Input, Card, Toast, Label
 │   ├── layout/             # Header
 │   └── features/
+│       ├── achievements/   # AchievementBadge, AchievementsDisplay, AchievementUnlockedModal
 │       ├── auth/           # LoginForm
+│       ├── celebration/    # CelebrationModal, ShareButton
+│       ├── progress/       # WeightChart, WeightList, StatsSummary, GoalSetter, ShareProgress
 │       ├── upload/         # Dropzone, ImagePreview
-│       ├── weight/         # WeightDisplay, WeightEdit
-│       └── progress/       # WeightChart, WeightList, StatsSummary
+│       ├── user/           # DisplayNameEditor
+│       └── weight/         # WeightDisplay, WeightEdit
 ├── db/
-│   ├── schema.ts           # Drizzle schema (users, weights, userPreferences)
+│   ├── schema.ts           # Drizzle schema (users, weights, userPreferences, achievements)
 │   ├── index.ts            # Database connection
 │   └── queries.ts          # Database query functions
 ├── services/
 │   ├── auth.ts             # Session management (iron-session)
 │   └── claude-vision.ts    # OCR with Claude Vision API
 └── lib/
-    ├── utils.ts            # cn() helper for classnames
-    └── validations.ts      # Zod schemas
+    ├── utils.ts            # cn() helper, formatRelativeDate
+    ├── validations.ts      # Zod schemas
+    ├── achievements.ts     # Achievement checking logic
+    ├── achievement-types.ts # Achievement type definitions
+    └── celebrations.ts     # Celebration triggers (milestones, goals)
 ```
 
 ## Database Schema
 
-- **users**: id, username, passwordHash, createdAt
+- **users**: id, username, displayName, passwordHash, createdAt
 - **weights**: id, userId, weight, unit (lb/kg), imageUrl, note, recordedAt, createdAt
 - **userPreferences**: userId, preferredUnit, goalWeight
+- **achievements**: id, userId, type, unlockedAt
 
 ## Environment Variables
 
@@ -120,3 +128,39 @@ npm run dev                    # In one terminal
 npm run view                   # Takes screenshots
 npm run test:visual            # Runs visual regression tests
 ```
+
+## Features
+
+### Display Name
+Users can set a custom display name (shown in header greeting and celebrations). Click the name in the header to edit.
+
+### Achievements
+Badge system that unlocks for milestones:
+- First Steps (👣): First weigh-in
+- Dedicated (📝): 10 entries
+- Consistent (⭐): 30 entries
+- Week Warrior (🔥): 7-day streak
+- Goal Getter (🏆): Reach goal weight
+- Down 5 (💪): Lose 5 kg
+- Down 10 (🎯): Lose 10 kg
+
+Achievements display in the progress page and show inline in weight history.
+
+### Celebrations
+Modal celebrations trigger for:
+- Reaching goal weight
+- New lowest weight
+- Weight loss milestones (5kg, 10kg)
+
+### Sharing
+Web Share API integration for sharing progress (with fallback copy-to-clipboard).
+
+### Unicorn Images
+Custom unicorn illustrations used throughout:
+- `public/unicorns/1-5.png`: General unicorns (loading states, dropzone, etc.)
+- `public/unicorns/scales.png`: Current weight stat
+- `public/unicorns/chart.png`: Change stat
+- `public/unicorns/note.png`: Entries stat
+- `public/unicorns/goal.png`: Goal progress stat
+
+Images are optimized via Next.js Image component (automatic WebP conversion, caching).
