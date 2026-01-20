@@ -41,12 +41,15 @@ src/
 │   │   ├── layout.tsx      # Auth check + header
 │   │   ├── upload/         # Photo upload page
 │   │   ├── confirm/        # Weight confirmation page
-│   │   └── progress/       # Weight history + chart
+│   │   ├── progress/       # Weight history + chart
+│   │   └── admin/          # Admin dashboard (admin-only)
 │   ├── api/
 │   │   ├── auth/login/     # POST login/register
 │   │   ├── auth/logout/    # POST logout
 │   │   ├── ocr/            # POST image → Claude Vision
-│   │   └── weights/        # CRUD weight entries
+│   │   ├── weights/        # CRUD weight entries
+│   │   ├── activity/       # POST log progress views
+│   │   └── admin/          # Admin API (users, activity logs)
 │   └── page.tsx            # Landing page (redirects)
 ├── components/
 │   ├── ui/                 # Button, Input, Card, Toast, Label
@@ -60,7 +63,7 @@ src/
 │       ├── user/           # DisplayNameEditor
 │       └── weight/         # WeightDisplay, WeightEdit
 ├── db/
-│   ├── schema.ts           # Drizzle schema (users, weights, userPreferences, achievements)
+│   ├── schema.ts           # Drizzle schema (users, weights, userPreferences, achievements, activityLog)
 │   ├── index.ts            # Database connection
 │   └── queries.ts          # Database query functions
 ├── services/
@@ -71,7 +74,8 @@ src/
     ├── validations.ts      # Zod schemas
     ├── achievements.ts     # Achievement checking logic
     ├── achievement-types.ts # Achievement type definitions
-    └── celebrations.ts     # Celebration triggers (milestones, goals)
+    ├── celebrations.ts     # Celebration triggers (milestones, goals)
+    └── admin.ts            # Admin username check
 ```
 
 ## Database Schema
@@ -80,6 +84,7 @@ src/
 - **weights**: id, userId, weight, unit (lb/kg), imageUrl, note, recordedAt, createdAt
 - **userPreferences**: userId, preferredUnit, goalWeight
 - **achievements**: id, userId, type, unlockedAt
+- **activityLog**: id, userId, action (weight_logged/progress_viewed), metadata, createdAt
 
 ## Environment Variables
 
@@ -164,3 +169,17 @@ Custom unicorn illustrations used throughout:
 - `public/unicorns/goal.png`: Goal progress stat
 
 Images are optimized via Next.js Image component (automatic WebP conversion, caching).
+
+### Admin Mode
+Admin dashboard at `/admin` for viewing all users and activity logs.
+
+**Access**: Login with a username in the admin list (`src/lib/admin.ts`). Default: `spacemonkey`.
+
+**Features**:
+- View all registered users
+- Filter activity by user
+- Track weight logs and progress page views
+
+**API Endpoints** (403 for non-admins):
+- `GET /api/admin/users` - List all users
+- `GET /api/admin/activity?userId=` - List activity logs (optional user filter)

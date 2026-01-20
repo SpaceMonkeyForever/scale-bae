@@ -7,6 +7,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { DisplayNameEditor } from "@/components/features/user/display-name-editor";
+import { isAdmin } from "@/lib/admin";
 
 interface HeaderProps {
   username?: string;
@@ -42,6 +43,7 @@ export function Header({ username, displayName }: HeaderProps) {
   const navLinks = [
     { href: "/upload", label: "Upload" },
     { href: "/progress", label: "Progress" },
+    ...(isAdmin(username) ? [{ href: "/admin", label: "Admin" }] : []),
   ];
 
   const greeting = currentDisplayName || username;

@@ -47,6 +47,18 @@ export const achievements = sqliteTable("achievements", {
     .default(sql`(unixepoch())`),
 });
 
+export const activityLog = sqliteTable("activity_log", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  action: text("action", { enum: ["weight_logged", "progress_viewed"] }).notNull(),
+  metadata: text("metadata"),
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(unixepoch())`),
+});
+
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 export type Weight = typeof weights.$inferSelect;
@@ -54,3 +66,5 @@ export type NewWeight = typeof weights.$inferInsert;
 export type UserPreferences = typeof userPreferences.$inferSelect;
 export type Achievement = typeof achievements.$inferSelect;
 export type NewAchievement = typeof achievements.$inferInsert;
+export type ActivityLog = typeof activityLog.$inferSelect;
+export type NewActivityLog = typeof activityLog.$inferInsert;

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { v4 as uuidv4 } from "uuid";
 import { getSession } from "@/services/auth";
-import { getWeightsByUserId, createWeight } from "@/db/queries";
+import { getWeightsByUserId, createWeight, createActivityLog } from "@/db/queries";
 import { weightEntrySchema } from "@/lib/validations";
 
 export async function GET() {
@@ -55,6 +55,14 @@ export async function POST(request: NextRequest) {
       unit,
       recordedAt,
       note,
+    });
+
+    // Log activity
+    await createActivityLog({
+      id: uuidv4(),
+      userId: session.userId,
+      action: "weight_logged",
+      metadata: JSON.stringify({ weight, unit }),
     });
 
     return NextResponse.json({ weight: newWeight[0] });

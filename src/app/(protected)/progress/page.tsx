@@ -35,7 +35,16 @@ export default function ProgressPage() {
     fetchWeights();
     fetchPreferences();
     fetchAchievements();
+    logProgressView();
   }, []);
+
+  const logProgressView = async () => {
+    try {
+      await fetch("/api/activity", { method: "POST" });
+    } catch {
+      // Silently fail - activity logging is non-critical
+    }
+  };
 
   const fetchWeights = async () => {
     try {

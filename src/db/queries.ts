@@ -1,6 +1,6 @@
 import { eq, desc } from "drizzle-orm";
 import { db } from "./index";
-import { users, weights, userPreferences, achievements, NewUser, NewWeight, NewAchievement } from "./schema";
+import { users, weights, userPreferences, achievements, activityLog, NewUser, NewWeight, NewAchievement, NewActivityLog } from "./schema";
 
 // User queries
 export async function getUserByUsername(username: string) {
@@ -80,4 +80,29 @@ export async function getAchievementsByUserId(userId: string) {
 
 export async function createAchievement(achievement: NewAchievement) {
   return db.insert(achievements).values(achievement).returning();
+}
+
+// Activity log queries
+export async function createActivityLog(log: NewActivityLog) {
+  return db.insert(activityLog).values(log).returning();
+}
+
+export async function getActivityLogsByUserId(userId: string) {
+  return db.query.activityLog.findMany({
+    where: eq(activityLog.userId, userId),
+    orderBy: [desc(activityLog.createdAt)],
+  });
+}
+
+// Admin queries
+export async function getAllUsers() {
+  return db.query.users.findMany({
+    orderBy: [desc(users.createdAt)],
+  });
+}
+
+export async function getAllActivityLogs() {
+  return db.query.activityLog.findMany({
+    orderBy: [desc(activityLog.createdAt)],
+  });
 }
