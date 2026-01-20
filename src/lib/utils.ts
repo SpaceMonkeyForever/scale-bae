@@ -30,6 +30,15 @@ export function formatRelativeDate(date: Date): string {
   return formatDate(date);
 }
 
+export function formatDateTime(date: Date): string {
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(date);
+}
+
 export function convertWeight(
   weight: number,
   from: "lb" | "kg",

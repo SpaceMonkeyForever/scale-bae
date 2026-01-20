@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { formatRelativeDate } from "@/lib/utils";
+import { formatRelativeDate, formatDateTime } from "@/lib/utils";
 
 interface User {
   id: string;
@@ -177,7 +177,7 @@ export default function AdminPage() {
                           )}
                         </div>
                         <span className="text-sm text-bae-500">
-                          {formatRelativeDate(new Date(log.createdAt))}
+                          {formatDateTime(new Date(log.createdAt))}
                         </span>
                       </div>
                       {!selectedUserId && user && (
