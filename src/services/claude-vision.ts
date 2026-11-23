@@ -19,8 +19,8 @@ export async function extractWeightFromImage(
 ): Promise<OCRResult> {
   try {
     const response = await anthropic.messages.create({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 256,
+      model: "claude-opus-5-5",
+      max_tokens: 2048,
       messages: [
         {
           role: "user",
@@ -65,8 +65,10 @@ If you cannot read the weight clearly, return:
       ],
     });
 
-    const text =
-      response.content[0].type === "text" ? response.content[0].text : "";
+    const text = response.content
+      .filter((block) => block.type === "text")
+      .map((block) => block.text)
+      .join("");
 
     // Parse JSON from response
     const jsonMatch = text.match(/\{[\s\S]*\}/);
@@ -76,7 +78,10 @@ If you cannot read the weight clearly, return:
 
     const parsed = JSON.parse(jsonMatch[0]);
 
-    if (parsed.weight !== null) {
+    if (
+      Number.isFinite(parsed.weight) && parsed.weight > 0 &&
+      (parsed.unit === "lb" || parsed.unit === "kg")
+    ) {
       return {
         success: true,
         weight: parsed.weight,
@@ -93,10 +98,12 @@ If you cannot read the weight clearly, return:
       };
     }
   } catch (error) {
-    console.error("Claude Vision error:", error);
+    if (error instanceof Anthropic.APIError) {
+      console.error("Scale photo reader API error", { status: error.status, requestId: error.requestID });
+    }
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Unknown error",
+      error: "The photo reader couldn’t finish this scan. Please try again.",
     };
   }
 }
