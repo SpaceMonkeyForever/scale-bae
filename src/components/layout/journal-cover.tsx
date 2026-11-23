@@ -44,6 +44,7 @@ export function JournalCover({ page }: { page: CoverPage }) {
         <span className="sky-flare flare-one">✦</span>
         <span className="sky-flare flare-two">✦</span>
         <span className="sky-flare flare-three">✧</span>
+        <span className="sky-hearts" />
         <Image className="sky-mascot" src={`/unicorns/${artwork}.png`} alt="" width={320} height={320} sizes={page === "login" ? "(max-width: 720px) 170px, 300px" : "175px"} priority />
       </div>
     </section>

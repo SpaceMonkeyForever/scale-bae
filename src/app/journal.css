@@ -121,8 +121,12 @@
 .flare-one { right: 13%; top: 16%; font-size: 2rem; }
 .flare-two { left: 16%; bottom: 21%; font-size: 1.4rem; }
 .flare-three { right: 40%; bottom: 39%; font-size: 1.5rem; }
+.sky-hearts, .sky-mascot {
+  position: absolute; right: 1%; bottom: 6%; width: 46%;
+}
+.sky-hearts { aspect-ratio: 1; pointer-events: none; }
 .sky-mascot {
-  position: absolute; right: 1%; bottom: 6%; width: 46%; height: auto;
+  height: auto;
   filter: drop-shadow(0 .55rem .3rem #39284030);
 }
 .auth-panel {
@@ -214,8 +218,26 @@
   50% { transform: translateY(-8px) rotate(-2deg); }
 }
 @keyframes flare-glow { 50% { opacity: .4; transform: scale(.72); } }
+@keyframes heart-rise {
+  0% { opacity: 0; transform: translateY(.3em) rotate(-12deg) scale(.78); }
+  22% { opacity: .9; }
+  58% { opacity: .85; transform: translate(var(--sway), -1.8em) rotate(6deg); }
+  100% { opacity: 0; transform: translate(0, -3.7em) rotate(-4deg) scale(.86); }
+}
 @keyframes read-sweep { from { transform: translateY(-100%); } to { transform: translateY(550%); } }
 @media (prefers-reduced-motion: no-preference) {
+  .sky-hearts::before, .sky-hearts::after {
+    position: absolute; left: 20%; top: 30%;
+    font: normal clamp(1rem, 1.65vw, 1.45rem)/1 Georgia, serif;
+    color: #a55a78;
+    animation: heart-rise 3s ease-in-out .25s both;
+  }
+  .sky-hearts::before { content: "♥︎"; --sway: -.45em; }
+  .sky-hearts::after {
+    content: "♡"; --sway: .4em; left: 12%; top: 25%;
+    color: #955474; font-size: clamp(.9rem, 1.35vw, 1.15rem);
+    animation-delay: 1.55s;
+  }
   .sky-moon, .sky-orbit, .sky-flare { transition: translate .3s ease-out; }
   .sky-moon { translate: var(--sky-x, 0px) var(--sky-y, 0px); }
   .sky-orbit { translate: calc(var(--sky-x, 0px) * -.5) calc(var(--sky-y, 0px) * -.5); }
