@@ -57,7 +57,10 @@ export function GoalSetter({ currentGoal, unit, onSave }: GoalSetterProps) {
               <Button
                 variant="secondary"
                 size="sm"
-                onClick={() => setIsEditing(true)}
+                onClick={() => {
+                  setGoalValue(currentGoal?.toString() || "");
+                  setIsEditing(true);
+                }}
               >
                 {currentGoal ? "Edit" : "Set Goal"}
               </Button>

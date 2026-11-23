@@ -1,3 +1,5 @@
+import { weightInUnit } from "./utils";
+
 export interface WeeklySummaryData {
   weekNumber: number;
   entriesThisWeek: number;
@@ -123,7 +125,7 @@ export function checkForWeeklySummary(
   let weeklyChange: number | null = null;
 
   if (weekEntries.length > 1) {
-    startWeight = weekEntries[0].weight;
+    startWeight = weightInUnit(weekEntries[0], unit);
     weeklyChange = endWeight - startWeight;
   }
 

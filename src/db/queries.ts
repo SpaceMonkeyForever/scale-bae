@@ -1,4 +1,4 @@
-import { eq, desc } from "drizzle-orm";
+import { and, eq, desc } from "drizzle-orm";
 import { db } from "./index";
 import { users, weights, userPreferences, achievements, activityLog, NewUser, NewWeight, NewAchievement, NewActivityLog } from "./schema";
 
@@ -42,8 +42,16 @@ export async function createWeight(weight: NewWeight) {
 export async function deleteWeight(id: string, userId: string) {
   return db
     .delete(weights)
-    .where(eq(weights.id, id))
+    .where(and(eq(weights.id, id), eq(weights.userId, userId)))
     .returning();
+}
+
+export function getOwnedWeight(id: string, userId: string) {
+  return db.query.weights.findFirst({ where: and(eq(weights.id, id), eq(weights.userId, userId)) });
+}
+
+export function restoreWeight(weight: NewWeight) {
+  return db.insert(weights).values(weight).onConflictDoNothing({ target: weights.id });
 }
 
 // User preferences queries
@@ -55,7 +63,7 @@ export async function getUserPreferences(userId: string) {
 
 export async function upsertUserPreferences(
   userId: string,
-  prefs: { preferredUnit?: "lb" | "kg"; goalWeight?: number | null }
+  prefs: { preferredUnit?: "lb" | "kg"; goalWeight?: number | null; goalUnit?: "lb" | "kg" | null }
 ) {
   const existing = await getUserPreferences(userId);
   if (existing) {

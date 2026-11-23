@@ -72,6 +72,42 @@ describe("Progress Page", () => {
     });
   });
 
+  it("opens older history in All Time and respects an explicitly empty range", async () => {
+    const username = generateUniqueUsername("older");
+    createdUsers.push(username);
+    const userId = await createTestUser(username, TEST_PASSWORD);
+    await seedWeightEntries(userId, [
+      { weight: 72, unit: "kg", daysAgo: 160 },
+      { weight: 71, unit: "kg", daysAgo: 120 },
+    ]);
+    await loginUser(page, username, TEST_PASSWORD);
+    await navigateTo(page, "/progress");
+
+    const selectedRange = '[aria-label="Chart time range"] [aria-pressed="true"]';
+    const chartLine = '[data-testid="weight-chart"] .recharts-line-curve';
+    await page.waitForSelector(chartLine);
+    expect(await page.$eval(selectedRange, (el) => el.textContent)).toBe("All Time");
+    const latestDate = await page.$eval("time[datetime]", (el) => el.getAttribute("datetime"));
+    const newestHistoryItem = await page.$eval(SELECTORS.progress.weightListItem, (el) => el.textContent);
+    expect(latestDate).toBeTruthy();
+    const dateLabel = await page.$eval("time[datetime]", (el) => el.textContent);
+    expect(newestHistoryItem).toContain(dateLabel);
+
+    await page.locator("::-p-aria(3 Months)").click();
+    await page.waitForSelector("::-p-text(No weigh-ins in this period.)");
+    expect(await page.$eval(selectedRange, (el) => el.textContent)).toBe("3 Months");
+    expect(await page.$$(SELECTORS.progress.weightListItem)).toHaveLength(2);
+    await page.locator("::-p-aria(View all time)").click();
+    await page.waitForSelector(chartLine);
+    expect(await page.$eval(selectedRange, (el) => el.textContent)).toBe("All Time");
+
+    await seedWeightEntries(userId, [{ weight: 71, unit: "kg", daysAgo: 1 }]);
+    await navigateTo(page, "/progress");
+    await page.waitForSelector(selectedRange);
+    expect(await page.$eval(selectedRange, (el) => el.textContent)).toBe("1 Month");
+    expect(await page.$$(SELECTORS.progress.weightListItem)).toHaveLength(3);
+  });
+
   describe("With Data", () => {
     let dataUsername: string;
     let dataUserId: string;
@@ -292,6 +328,34 @@ describe("Progress Page", () => {
   });
 
   describe("Delete Weight Entry", () => {
+    it("compares mixed units and restores an identical weigh-in with Undo", async () => {
+      const username = generateUniqueUsername("mixed");
+      createdUsers.push(username);
+      const userId = await createTestUser(username, TEST_PASSWORD);
+      await seedWeightEntries(userId, [
+        { weight: 70, unit: "kg", daysAgo: 4 },
+        { weight: 154.3, unit: "lb", daysAgo: 1, note: "Keep this note" },
+      ]);
+      await loginUser(page, username, TEST_PASSWORD);
+      await navigateTo(page, "/progress");
+      await page.waitForSelector(SELECTORS.progress.weightListItem);
+      const readWeights = () => page.evaluate(async () => (await (await fetch("/api/weights")).json()).weights);
+      const original = await readWeights();
+      expect(original).toHaveLength(2);
+      expect(await page.$eval(SELECTORS.progress.totalChange, el => el.textContent)).toContain("0.0 lb");
+      const points = await page.$$eval(".recharts-line-dot", dots => dots.map(dot => dot.getAttribute("cy")));
+      expect(points).toHaveLength(2);
+      expect(points[0]).toBe(points[1]);
+      await page.click(SELECTORS.progress.deleteWeightButton);
+      await page.waitForSelector("::-p-aria(Undo)");
+      expect(await readWeights()).toHaveLength(1);
+      await page.locator("::-p-aria(Undo)").click();
+      await page.waitForFunction(() => document.querySelectorAll('[data-testid="weight-list-item"]').length === 2);
+      expect(await readWeights()).toEqual(original);
+      await navigateTo(page, "/progress");
+      expect(await page.$$(SELECTORS.progress.weightListItem)).toHaveLength(2);
+    });
+
     it("should delete weight entry from list", async () => {
       const deleteUsername = generateUniqueUsername("delete");
       createdUsers.push(deleteUsername);

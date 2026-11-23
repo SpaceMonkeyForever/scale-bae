@@ -12,6 +12,7 @@ import { ShareButton } from "@/components/features/celebration/share-button";
 import { AchievementUnlockedModal } from "@/components/features/achievements/achievement-unlocked-modal";
 import { WeeklySummaryModal } from "@/components/features/weekly-summary/weekly-summary-modal";
 import { checkForCelebration } from "@/lib/celebrations";
+import { weightInUnit } from "@/lib/utils";
 import { checkForWeeklySummary, WeeklySummaryData } from "@/lib/weekly-summary";
 import { UnlockedAchievement, ACHIEVEMENT_TYPES } from "@/lib/achievement-types";
 
@@ -24,8 +25,8 @@ interface PendingWeight {
 }
 
 interface UserData {
-  previousWeight: number | null;
-  goalWeight: number | null;
+  previousWeight: { weight: number; unit: "lb" | "kg" } | null;
+  goalWeight: { weight: number; unit: "lb" | "kg" } | null;
   displayName: string | null;
 }
 
@@ -63,8 +64,10 @@ export default function ConfirmPage() {
       const userData = await userRes.json();
 
       setUserData({
-        previousWeight: weightsData.weights?.[0]?.weight || null,
-        goalWeight: prefsData.preferences?.goalWeight || null,
+        previousWeight: weightsData.weights?.[0] ?? null,
+        goalWeight: prefsData.preferences?.goalWeight != null
+          ? { weight: prefsData.preferences.goalWeight, unit: prefsData.preferences.goalUnit ?? prefsData.preferences.preferredUnit }
+          : null,
         displayName: userData.user?.displayName || null,
       });
     } catch (error) {
@@ -103,13 +106,14 @@ export default function ConfirmPage() {
       });
 
       // Check for new achievements
+      const goalWeight = userData.goalWeight ? weightInUnit(userData.goalWeight, pendingWeight.unit) : null;
       const achievementsRes = await fetch("/api/achievements", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           weight: pendingWeight.weight,
           unit: pendingWeight.unit,
-          goalWeight: userData.goalWeight,
+          goalWeight,
         }),
       });
       const achievementsData = await achievementsRes.json();
@@ -124,8 +128,8 @@ export default function ConfirmPage() {
       const celebrationData = checkForCelebration(
         pendingWeight.weight,
         pendingWeight.unit,
-        userData.previousWeight,
-        userData.goalWeight,
+        userData.previousWeight ? weightInUnit(userData.previousWeight, pendingWeight.unit) : null,
+        goalWeight,
         userData.displayName || undefined
       );
 

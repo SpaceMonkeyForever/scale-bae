@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/services/auth";
-import { getUserPreferences, upsertUserPreferences } from "@/db/queries";
+import { getUserPreferences, getWeightsByUserId, upsertUserPreferences } from "@/db/queries";
 
 export async function GET() {
   try {
@@ -30,7 +30,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { preferredUnit, goalWeight } = body;
+    const { preferredUnit, goalWeight, goalUnit } = body;
 
     // Validate goalWeight if provided
     if (goalWeight !== undefined && goalWeight !== null) {
@@ -51,9 +51,16 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    const updateData: { preferredUnit?: "lb" | "kg"; goalWeight?: number | null } = {};
+    const updateData: Parameters<typeof upsertUserPreferences>[1] = {};
     if (preferredUnit) updateData.preferredUnit = preferredUnit;
-    if (goalWeight !== undefined) updateData.goalWeight = goalWeight === null ? null : Number(goalWeight);
+    if (goalWeight !== undefined) {
+      if (goalUnit !== undefined && !["lb", "kg"].includes(goalUnit)) {
+        return NextResponse.json({ error: "Invalid goal unit" }, { status: 400 });
+      }
+      updateData.goalWeight = goalWeight === null ? null : Number(goalWeight);
+      updateData.goalUnit = goalWeight === null ? null :
+        goalUnit ?? (await getWeightsByUserId(session.userId))[0]?.unit ?? "lb";
+    }
 
     const updated = await upsertUserPreferences(session.userId, updateData);
     return NextResponse.json({ preferences: updated[0] });

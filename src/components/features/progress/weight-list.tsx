@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { motion } from "motion/react";
-import { formatRelativeDate } from "@/lib/utils";
+import { formatRelativeDate, weightInUnit } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { UnlockedAchievement } from "@/lib/achievement-types";
@@ -79,7 +79,7 @@ export function WeightList({ entries, achievements = [], onDelete }: WeightListP
     >
       {entries.map((entry, index) => {
         const prevEntry = entries[index + 1];
-        const change = prevEntry ? entry.weight - prevEntry.weight : null;
+        const change = prevEntry ? entry.weight - weightInUnit(prevEntry, entry.unit) : null;
         const dayAchievements = getAchievementsForDate(entry.recordedAt);
 
         return (

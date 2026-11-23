@@ -34,6 +34,7 @@ export const userPreferences = sqliteTable("user_preferences", {
     .notNull()
     .default("lb"),
   goalWeight: real("goal_weight"),
+  goalUnit: text("goal_unit", { enum: ["lb", "kg"] }),
 });
 
 export const achievements = sqliteTable("achievements", {

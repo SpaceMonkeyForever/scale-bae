@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 import { getAchievementsByUserId, createAchievement, getWeightsByUserId } from "@/db/queries";
 import { ACHIEVEMENT_TYPES, UnlockedAchievement } from "./achievement-types";
+import { convertWeight } from "./utils";
 
 // Re-export types for convenience
 export { ACHIEVEMENT_TYPES, type AchievementType, type UnlockedAchievement } from "./achievement-types";
@@ -92,11 +93,8 @@ export async function checkForNewAchievements(
   // Check: Weight loss milestones
   if (weights.length >= 2) {
     // Get the oldest weight (starting weight)
-    const startWeight = weights[weights.length - 1].weight;
-    const totalLost = startWeight - newWeight;
-
-    // Convert to kg for comparison
-    const lostInKg = unit === "kg" ? totalLost : totalLost / 2.20462;
+    const first = weights[weights.length - 1];
+    const lostInKg = convertWeight(first.weight, first.unit, "kg") - convertWeight(newWeight, unit, "kg");
 
     if (lostInKg >= 5) {
       await tryUnlock("down_5");

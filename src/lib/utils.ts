@@ -45,5 +45,9 @@ export function convertWeight(
   to: "lb" | "kg"
 ): number {
   if (from === to) return weight;
-  return from === "lb" ? weight * 0.453592 : weight * 2.20462;
+  return from === "lb" ? weight * 0.45359237 : weight / 0.45359237;
+}
+
+export function weightInUnit(entry: { weight: number; unit: "lb" | "kg" }, unit: "lb" | "kg"): number {
+  return Number(convertWeight(entry.weight, entry.unit, unit).toFixed(1));
 }

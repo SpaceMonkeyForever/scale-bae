@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { motion } from "motion/react";
 import { Card } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
+import { cn, formatDate } from "@/lib/utils";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -27,6 +27,7 @@ const cardVariants = {
 
 interface StatsSummaryProps {
   currentWeight?: number;
+  latestRecordedAt?: string;
   startWeight?: number;
   goalWeight?: number;
   unit: "lb" | "kg";
@@ -35,6 +36,7 @@ interface StatsSummaryProps {
 
 export function StatsSummary({
   currentWeight,
+  latestRecordedAt,
   startWeight,
   goalWeight,
   unit,
@@ -43,18 +45,22 @@ export function StatsSummary({
   const change = currentWeight && startWeight ? currentWeight - startWeight : null;
   const goalProgress =
     currentWeight && startWeight && goalWeight
-      ? ((startWeight - currentWeight) / (startWeight - goalWeight)) * 100
+      ? startWeight === goalWeight
+        ? (currentWeight === goalWeight ? 100 : 0)
+        : ((startWeight - currentWeight) / (startWeight - goalWeight)) * 100
       : null;
 
   const stats = [
     {
-      label: "Current",
+      label: "Latest weigh-in",
+      detail: latestRecordedAt && <time dateTime={latestRecordedAt}>{formatDate(new Date(latestRecordedAt))}</time>,
       value: currentWeight ? `${currentWeight.toFixed(1)} ${unit}` : "-",
       image: "/unicorns/scales.png",
       testId: "current-weight",
     },
     {
       label: "Change",
+      detail: totalEntries > 0 && "Since your first weigh-in",
       value: change !== null ? `${change > 0 ? "+" : ""}${change.toFixed(1)} ${unit}` : "-",
       image: "/unicorns/chart.png",
       color: change !== null ? (change < 0 ? "text-mint-500" : "text-bae-600") : undefined,
@@ -89,7 +95,10 @@ export function StatsSummary({
         <motion.div key={stat.label} variants={cardVariants}>
           <Card data-testid={stat.testId} className="journal-stat">
             <Image src={stat.image} width={86} height={86} alt="" sizes="68px" />
-            <div className="stat-label">{stat.label}</div>
+            <div>
+              <div className="stat-label">{stat.label}</div>
+              {stat.detail && <div className="stat-detail">{stat.detail}</div>}
+            </div>
             <div className={cn("stat-value", stat.color)}>
               {stat.value}
             </div>

@@ -192,6 +192,7 @@
 }
 .journal-stat img { position: absolute; right: .45rem; top: .25rem; width: 3.8rem; height: 3.8rem; object-fit: contain; z-index: -1; }
 .stat-label { font-size: .85rem; color: #62566e; font-weight: 550; max-width: calc(100% - 3rem); }
+.stat-detail { max-width: calc(100% - 2.5rem); font-size: .75rem; color: #62566e; line-height: 1.35; margin-top: .15rem; }
 .stat-value { font-size: clamp(1.4rem, 2.4vw, 2.15rem); letter-spacing: -.055em; font-weight: 640; font-variant-numeric: tabular-nums; }
 .journal-stat .text-mint-500 { color: #28735b; }
 .progress-cover { position: relative; }
