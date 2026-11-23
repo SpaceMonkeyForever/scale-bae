@@ -13,6 +13,7 @@ import { AchievementUnlockedModal } from "@/components/features/achievements/ach
 import { WeeklySummaryModal } from "@/components/features/weekly-summary/weekly-summary-modal";
 import { checkForCelebration } from "@/lib/celebrations";
 import { weightInUnit } from "@/lib/utils";
+import { chimeOnSave } from "@/lib/save-chime";
 import { checkForWeeklySummary, WeeklySummaryData } from "@/lib/weekly-summary";
 import { UnlockedAchievement, ACHIEVEMENT_TYPES } from "@/lib/achievement-types";
 
@@ -30,12 +31,15 @@ interface UserData {
   displayName: string | null;
 }
 
+const SAVE_CHIME_KEY = "scale-bae:save-chime";
+
 export default function ConfirmPage() {
   const router = useRouter();
   const [pendingWeight, setPendingWeight] = useState<PendingWeight | null>(null);
   const [userData, setUserData] = useState<UserData>({ previousWeight: null, goalWeight: null, displayName: null });
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [chimeEnabled, setChimeEnabled] = useState(false);
   const [note, setNote] = useState("");
   const [celebration, setCelebration] = useState<CelebrationData | null>(null);
   const [weeklySummary, setWeeklySummary] = useState<WeeklySummaryData | null>(null);
@@ -49,8 +53,22 @@ export default function ConfirmPage() {
       return;
     }
     setPendingWeight(JSON.parse(stored));
+    try {
+      setChimeEnabled(localStorage.getItem(SAVE_CHIME_KEY) === "on");
+    } catch {
+      // The preference still works for this weigh-in when storage is unavailable.
+    }
     fetchUserData();
   }, [router]);
+
+  const changeChime = (enabled: boolean) => {
+    setChimeEnabled(enabled);
+    try {
+      localStorage.setItem(SAVE_CHIME_KEY, enabled ? "on" : "off");
+    } catch {
+      // Keep the in-memory choice.
+    }
+  };
 
   const fetchUserData = async () => {
     try {
@@ -81,7 +99,7 @@ export default function ConfirmPage() {
     setIsSaving(true);
 
     try {
-      const res = await fetch("/api/weights", {
+      const request = fetch("/api/weights", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -92,6 +110,8 @@ export default function ConfirmPage() {
         }),
       });
 
+      if (chimeEnabled) void chimeOnSave(request);
+      const res = await request;
       if (!res.ok) {
         throw new Error("Failed to save weight");
       }
@@ -316,6 +336,17 @@ export default function ConfirmPage() {
                   maxLength={500}
                 />
               </div>
+
+              <label className="flex min-h-11 w-fit items-center gap-2 text-sm text-bae-700">
+                <input
+                  type="checkbox"
+                  checked={chimeEnabled}
+                  onChange={(event) => changeChime(event.target.checked)}
+                  disabled={isSaving}
+                  className="size-4 accent-bae-600 focus-visible:outline-2 focus-visible:outline-offset-2"
+                />
+                Play a soft chime on save
+              </label>
 
               <div className="flex gap-2">
                 <Button
