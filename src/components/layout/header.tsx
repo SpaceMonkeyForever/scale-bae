@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { DisplayNameEditor } from "@/components/features/user/display-name-editor";
+import { Brand } from "@/components/layout/brand";
 import { isAdmin } from "@/lib/admin";
 
 interface HeaderProps {
@@ -51,7 +52,7 @@ export function Header({ username, displayName }: HeaderProps) {
     <header className="journal-header sticky top-0 z-50">
       <div className="journal-nav">
         <Link href="/upload" aria-label="Scale Bae home" className="journal-brand">
-          <span aria-hidden="true">✦</span> scale-bae
+          <Brand />
         </Link>
 
         <nav className="flex items-center gap-1">

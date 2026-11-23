@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import type { PointerEvent } from "react";
+import { Brand } from "@/components/layout/brand";
 
 type CoverPage = "login" | "upload" | "progress";
 
@@ -29,7 +30,7 @@ export function JournalCover({ page }: { page: CoverPage }) {
         currentTarget.style.removeProperty("--sky-y");
       }}>
       {page === "login" && (
-        <div className="cover-brand"><span aria-hidden="true">✦</span> scale-bae</div>
+        <div className="cover-brand"><Brand /></div>
       )}
       <div className="cover-copy">
         <h1>{title} <em>{accent}</em></h1>

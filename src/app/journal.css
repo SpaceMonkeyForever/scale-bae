@@ -36,21 +36,21 @@
 .cover-brand, .journal-brand {
   display: inline-flex;
   align-items: center;
-  gap: .55rem;
+  gap: .4rem;
   font-size: 1.35rem;
   line-height: 1;
   font-weight: 700;
-  letter-spacing: -.075em;
+  letter-spacing: -.06em;
 }
-.cover-brand > span, .journal-brand > span {
-  display: grid;
-  place-items: center;
-  width: 1.95rem;
-  height: 1.95rem;
-  border-radius: 50%;
-  font-size: 1.45rem;
-  color: #302643;
-  background: var(--journal-apricot);
+.brand-mark {
+  width: 2.15rem;
+  height: auto;
+  flex: none;
+}
+.brand-name { white-space: nowrap; }
+.brand-name i {
+  font: italic 1.14em/1 Georgia, "Times New Roman", serif;
+  letter-spacing: -.06em;
 }
 .journal-cover--login {
   min-height: clamp(560px, 79svh, 740px);
@@ -261,7 +261,7 @@
   .auth-intro { margin: .5rem 0 1.4rem; }
   .journal-nav, .journal-main { width: calc(100% - 1.5rem); }
   .journal-brand { font-size: 1.05rem; gap: .25rem; }
-  .journal-brand > span { width: 1.5rem; height: 1.5rem; font-size: 1rem; }
+  .journal-brand .brand-mark { width: 1.7rem; }
   .journal-nav nav a { padding-inline: .55rem; }
   .upload-layout { grid-template-columns: 1fr; }
   .journal-cover--upload { min-height: 13rem; padding: 1.5rem; }
