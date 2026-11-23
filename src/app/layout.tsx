@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
+import { MotionPreferences } from "@/components/layout/motion-preferences";
 import "./globals.css";
+import "./journal.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -19,7 +21,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} antialiased`}>{children}</body>
+      <body className={`${geistSans.variable} antialiased`}><MotionPreferences>{children}</MotionPreferences></body>
     </html>
   );
 }

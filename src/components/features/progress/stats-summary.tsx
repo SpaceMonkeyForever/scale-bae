@@ -87,21 +87,12 @@ export function StatsSummary({
     >
       {stats.map((stat) => (
         <motion.div key={stat.label} variants={cardVariants}>
-          <Card data-testid={stat.testId} className="p-3 text-center h-full">
-            <div className="h-28 flex items-center justify-center mb-2">
-              <Image
-                src={stat.image}
-                width={220}
-                height={120}
-                alt=""
-                className="object-contain max-h-28"
-                priority
-              />
-            </div>
-            <div className={cn("text-xl font-bold text-bae-700", stat.color)}>
+          <Card data-testid={stat.testId} className="journal-stat">
+            <Image src={stat.image} width={86} height={86} alt="" sizes="68px" />
+            <div className="stat-label">{stat.label}</div>
+            <div className={cn("stat-value", stat.color)}>
               {stat.value}
             </div>
-            <div className="text-sm text-bae-500">{stat.label}</div>
           </Card>
         </motion.div>
       ))}

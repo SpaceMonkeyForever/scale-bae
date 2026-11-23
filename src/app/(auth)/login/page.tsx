@@ -1,8 +1,10 @@
 import { LoginForm } from "@/components/features/auth/login-form";
+import { JournalCover } from "@/components/layout/journal-cover";
 
 export default function LoginPage() {
   return (
-    <main className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-bae-50 via-lavender-50 to-bae-100">
+    <main className="journal-entry">
+      <JournalCover page="login" />
       <LoginForm />
     </main>
   );

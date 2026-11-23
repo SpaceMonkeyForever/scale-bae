@@ -4,7 +4,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Dropzone } from "@/components/features/upload/dropzone";
 import { ImagePreview } from "@/components/features/upload/image-preview";
-import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { JournalCover } from "@/components/layout/journal-cover";
+import Image from "next/image";
 import { compressImage } from "@/lib/image-compression";
 
 interface OCRResult {
@@ -77,7 +78,7 @@ export default function UploadPage() {
       );
 
       router.push("/confirm");
-    } catch (err) {
+    } catch {
       setError("Failed to process image. Please try again.");
       setIsLoading(false);
     }
@@ -92,35 +93,35 @@ export default function UploadPage() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <Card>
-        <CardHeader className="text-center">
-          <CardTitle>Log Your Weight</CardTitle>
-          <CardDescription>
-            Take a photo of your scale and I'll read it for you
-          </CardDescription>
-        </CardHeader>
+    <div className="upload-layout">
+      <JournalCover page="upload" />
+      <section className="upload-panel" aria-label="Upload a scale photo">
+        {error && (
+          <div role="alert" data-testid="upload-error" className="mb-4 p-4 rounded-[var(--radius-bae)] bg-red-50 border border-red-200 text-red-700 text-center">
+            {error}
+            <button
+              onClick={handleRetake}
+              className="block mx-auto mt-2 text-sm underline hover:no-underline"
+            >
+              Try again
+            </button>
+          </div>
+        )}
 
-        <div className="p-6">
-          {error && (
-            <div className="mb-4 p-4 rounded-[var(--radius-bae)] bg-red-50 border border-red-200 text-red-700 text-center">
-              {error}
-              <button
-                onClick={handleRetake}
-                className="block mx-auto mt-2 text-sm underline hover:no-underline"
-              >
-                Try again
-              </button>
+        {preview && isLoading ? (
+          <div className="scale-scan" role="status" data-testid="upload-loading">
+            <div className="scan-photo">
+              <Image src={preview} alt="Selected scale photo" fill unoptimized sizes="240px" />
+              <span aria-hidden="true" />
             </div>
-          )}
-
-          {preview && !isLoading ? (
-            <ImagePreview src={preview} onRetake={handleRetake} />
-          ) : (
-            <Dropzone onFileSelect={handleFileSelect} isLoading={isLoading} name={userName} />
-          )}
-        </div>
-      </Card>
+            <p>Reading your scale…</p>
+          </div>
+        ) : preview ? (
+          <ImagePreview src={preview} onRetake={handleRetake} />
+        ) : (
+          <Dropzone onFileSelect={handleFileSelect} isLoading={isLoading} name={userName} />
+        )}
+      </section>
     </div>
   );
 }

@@ -14,9 +14,9 @@ export default async function ProtectedLayout({
   }
 
   return (
-    <div className="min-h-screen bg-bae-50">
+    <div className="journal-shell min-h-screen">
       <Header username={session.username} displayName={session.displayName} />
-      <main className="container mx-auto px-4 py-8">{children}</main>
+      <main className="journal-main">{children}</main>
     </div>
   );
 }

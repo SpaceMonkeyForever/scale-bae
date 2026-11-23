@@ -10,7 +10,7 @@ import { WeightList } from "@/components/features/progress/weight-list";
 import { GoalSetter } from "@/components/features/progress/goal-setter";
 import { ShareProgress } from "@/components/features/progress/share-progress";
 import { AchievementsDisplay } from "@/components/features/achievements/achievements-display";
-import { Button } from "@/components/ui/button";
+import { JournalCover } from "@/components/layout/journal-cover";
 import Link from "next/link";
 import { UnlockedAchievement, ACHIEVEMENT_TYPES } from "@/lib/achievement-types";
 
@@ -170,13 +170,58 @@ export default function ProgressPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-bae-800">Your Progress</h1>
-        <Link href="/upload">
-          <Button>Log Weight</Button>
-        </Link>
+    <div className="progress-layout space-y-6">
+      <div className="progress-cover">
+        <JournalCover page="progress" />
+        <Link href="/upload" className="progress-log">Log weight</Link>
       </div>
+
+      <motion.div
+        variants={sectionVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-50px" }}
+      >
+        <StatsSummary
+          currentWeight={currentWeight}
+          startWeight={startWeight}
+          goalWeight={goalWeight ?? undefined}
+          unit={unit}
+          totalEntries={entries.length}
+        />
+      </motion.div>
+
+      <motion.div
+        variants={sectionVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-50px" }}
+      >
+        <Card>
+          <CardHeader className="flex flex-wrap gap-3 items-center justify-between">
+            <CardTitle>Weight Over Time</CardTitle>
+            <div className="flex flex-wrap gap-1" aria-label="Chart time range" role="group">
+              {timeRanges.map((range) => (
+                <button
+                  key={range.value}
+                  aria-pressed={timeRange === range.value}
+                  onClick={() => setTimeRange(range.value)}
+                  className={`px-3 py-1 text-sm rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-bae-500 ${
+                    timeRange === range.value
+                      ? "bg-bae-500 text-white"
+                      : "bg-bae-100 text-bae-600 hover:bg-bae-200"
+                  }`}
+                >
+                  {range.label}
+                </button>
+              ))}
+            </div>
+          </CardHeader>
+          <CardContent>
+            <WeightChart key={timeRange} ref={chartRef} data={chartData} unit={unit} goalWeight={goalWeight ?? undefined} />
+          </CardContent>
+        </Card>
+      </motion.div>
 
       <motion.div
         className="grid gap-4 sm:grid-cols-2"
@@ -200,60 +245,7 @@ export default function ProgressPage() {
         />
       </motion.div>
 
-      <motion.div
-        variants={sectionVariants}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: "-50px" }}
-      >
-        <StatsSummary
-          currentWeight={currentWeight}
-          startWeight={startWeight}
-          goalWeight={goalWeight ?? undefined}
-          unit={unit}
-          totalEntries={entries.length}
-        />
-      </motion.div>
-
-      <motion.div
-        variants={sectionVariants}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: "-50px" }}
-      >
-        <AchievementsDisplay unlockedAchievements={achievements} />
-      </motion.div>
-
-      <motion.div
-        variants={sectionVariants}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: "-50px" }}
-      >
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Weight Over Time</CardTitle>
-            <div className="flex gap-1">
-              {timeRanges.map((range) => (
-                <button
-                  key={range.value}
-                  onClick={() => setTimeRange(range.value)}
-                  className={`px-3 py-1 text-sm rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-bae-500 ${
-                    timeRange === range.value
-                      ? "bg-bae-500 text-white"
-                      : "bg-bae-100 text-bae-600 hover:bg-bae-200"
-                  }`}
-                >
-                  {range.label}
-                </button>
-              ))}
-            </div>
-          </CardHeader>
-          <CardContent>
-            <WeightChart ref={chartRef} data={chartData} unit={unit} goalWeight={goalWeight ?? undefined} />
-          </CardContent>
-        </Card>
-      </motion.div>
+      <AchievementsDisplay unlockedAchievements={achievements} />
 
       <motion.div
         variants={sectionVariants}

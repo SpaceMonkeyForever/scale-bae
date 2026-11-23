@@ -1,17 +1,17 @@
 @import "tailwindcss";
 
 @theme inline {
-  /* Primary Pink (bae) palette */
-  --color-bae-50: #FFF5F7;
-  --color-bae-100: #FFEBEF;
-  --color-bae-200: #FFD6E0;
-  --color-bae-300: #FFC2D1;
-  --color-bae-400: #FFADC2;
-  --color-bae-500: #FF85A1;
-  --color-bae-600: #FF6B8A;
-  --color-bae-700: #E84A6F;
-  --color-bae-800: #C13A5A;
-  --color-bae-900: #9A2D47;
+  /* Journal lilac and plum palette */
+  --color-bae-50: #f7f4fc;
+  --color-bae-100: #eee7f8;
+  --color-bae-200: #ded6e8;
+  --color-bae-300: #c7b9d8;
+  --color-bae-400: #80718e;
+  --color-bae-500: #7551a3;
+  --color-bae-600: #654687;
+  --color-bae-700: #533667;
+  --color-bae-800: #3f304f;
+  --color-bae-900: #2c233a;
 
   /* Accent Lavender */
   --color-lavender-50: #FAF5FF;
@@ -47,8 +47,8 @@
   --font-display: var(--font-poppins), system-ui, sans-serif;
 
   /* Shadows */
-  --shadow-bae: 0 4px 14px 0 rgba(255, 133, 161, 0.25);
-  --shadow-bae-lg: 0 10px 40px 0 rgba(255, 133, 161, 0.3);
+  --shadow-bae: 0 4px 14px 0 rgba(50, 30, 80, 0.06);
+  --shadow-bae-lg: 0 10px 40px 0 rgba(50, 30, 80, 0.13);
 
   /* Border radius */
   --radius-bae: 1rem;
@@ -99,8 +99,8 @@
 }
 
 :root {
-  --background: #FFF5F7;
-  --foreground: #9A2D47;
+  --background: #f7f4fc;
+  --foreground: #2c233a;
 }
 
 body {

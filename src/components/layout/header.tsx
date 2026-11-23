@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -49,19 +48,10 @@ export function Header({ username, displayName }: HeaderProps) {
   const greeting = currentDisplayName || username;
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-bae-200 bg-white/80 backdrop-blur-sm">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4 gap-2">
-        <Link href="/upload" className="flex items-center gap-2 shrink-0">
-          <Image
-            src="/unicorns/1.png"
-            alt=""
-            width={32}
-            height={32}
-            className="hover:animate-[wiggle_0.5s_ease-in-out] transition-transform"
-          />
-          <span className="text-xl font-semibold text-bae-700 hidden sm:inline">
-            scale-bae
-          </span>
+    <header className="journal-header sticky top-0 z-50">
+      <div className="journal-nav">
+        <Link href="/upload" aria-label="Scale Bae home" className="journal-brand">
+          <span aria-hidden="true">✦</span> scale-bae
         </Link>
 
         <nav className="flex items-center gap-1">
@@ -69,6 +59,7 @@ export function Header({ username, displayName }: HeaderProps) {
             <Link
               key={link.href}
               href={link.href}
+              aria-current={pathname === link.href ? "page" : undefined}
               className={cn(
                 "px-3 sm:px-4 py-2 rounded-[var(--radius-bae)] text-sm font-medium transition-colors",
                 "hover:bg-bae-100",

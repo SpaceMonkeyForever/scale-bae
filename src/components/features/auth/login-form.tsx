@@ -1,12 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 
 export function LoginForm() {
   const router = useRouter();
@@ -50,29 +48,20 @@ export function LoginForm() {
   };
 
   return (
-    <Card className="w-full max-w-md animate-[slide-up_200ms_ease-out]">
-      <CardHeader className="text-center">
-        <Image
-          src="/unicorns/1.png"
-          alt=""
-          width={160}
-          height={160}
-          className="mx-auto mb-2"
-        />
-        <CardTitle className="text-3xl">scale-bae</CardTitle>
-        <CardDescription>
-          {isRegister
-            ? "Create an account to start tracking"
-            : "Welcome back!"}
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
+    <section className="auth-panel" aria-labelledby="auth-heading">
+      <div className="auth-inner">
+        <span className="auth-emblem" aria-hidden="true">✦</span>
+        <h2 id="auth-heading" className="journal-heading">{isRegister ? "Create an account" : "Welcome back."}</h2>
+        <p className="auth-intro">{isRegister ? "Start your personal weight journal." : "Sign in to your weight journal."}</p>
+        <form onSubmit={handleSubmit} className="journal-form">
           <div className="space-y-2">
             <Label htmlFor="username">Username</Label>
             <Input
               id="username"
               type="text"
+              name="username"
+              autoCapitalize="none"
+              spellCheck={false}
               placeholder="Enter your username"
               value={formData.username}
               onChange={(e) =>
@@ -88,6 +77,7 @@ export function LoginForm() {
             <Input
               id="password"
               type="password"
+              name="password"
               placeholder="Enter your password"
               value={formData.password}
               onChange={(e) =>
@@ -130,7 +120,7 @@ export function LoginForm() {
             </button>
           </p>
         </form>
-      </CardContent>
-    </Card>
+      </div>
+    </section>
   );
 }

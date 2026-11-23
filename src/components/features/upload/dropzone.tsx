@@ -32,11 +32,11 @@ export function Dropzone({ onFileSelect, isLoading, name }: DropzoneProps) {
       setIsDragging(false);
 
       const file = e.dataTransfer.files[0];
-      if (file && file.type.startsWith("image/")) {
+      if (!isLoading && file && file.type.startsWith("image/")) {
         onFileSelect(file);
       }
     },
-    [onFileSelect]
+    [onFileSelect, isLoading]
   );
 
   const handleFileInput = useCallback(
@@ -52,11 +52,12 @@ export function Dropzone({ onFileSelect, isLoading, name }: DropzoneProps) {
   return (
     <div
       data-testid="dropzone"
+      data-dragging={isDragging}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
       className={cn(
-        "relative flex flex-col items-center justify-center w-full min-h-[300px] p-8",
+        "upload-well relative flex flex-col items-center justify-center w-full min-h-[300px] p-8",
         "border-2 border-dashed rounded-[var(--radius-bae)] transition-all duration-200",
         "cursor-pointer",
         isDragging
@@ -70,7 +71,7 @@ export function Dropzone({ onFileSelect, isLoading, name }: DropzoneProps) {
         accept="image/*"
         capture="environment"
         onChange={handleFileInput}
-        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+        className="absolute z-10 inset-0 w-full h-full opacity-0 cursor-pointer"
         disabled={isLoading}
         aria-label="Upload an image of your scale"
       />
@@ -88,22 +89,16 @@ export function Dropzone({ onFileSelect, isLoading, name }: DropzoneProps) {
         </div>
       ) : (
         <>
-          <Image
-            src="/unicorns/camera.png"
-            alt=""
-            width={260}
-            height={260}
-            className="mb-4 animate-[float_3s_ease-in-out_infinite] pointer-events-none"
-          />
-          <h3 className="text-xl font-semibold text-bae-800 mb-2">
-            Show me your progress{name ? `, ${name}` : ""}!
-          </h3>
-          <p className="text-bae-600 text-center max-w-xs">
-            Drop a photo of your scale here, or tap to take a picture
-          </p>
-          <p className="text-sm text-bae-500 mt-4">
-            Supports JPEG, PNG, WebP, GIF
-          </p>
+          <span className="camera-tile" aria-hidden="true">
+            <svg width="38" height="38" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.7">
+              <path d="M4 10h6l2-4h8l2 4h6v16H4z" strokeLinejoin="round" />
+              <circle cx="16" cy="17" r="5" />
+            </svg>
+          </span>
+          <h2>{isDragging ? "Drop your photo" : "Add a scale photo"}</h2>
+          <p>{name ? `Ready, ${name}? ` : ""}Drag a photo here or use your camera.</p>
+          <span className="photo-action">Choose photo</span>
+          <small>JPEG, PNG, WebP or GIF</small>
         </>
       )}
     </div>

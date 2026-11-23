@@ -11,6 +11,7 @@ import {
   ResponsiveContainer,
   ReferenceLine,
 } from "recharts";
+import { useReducedMotion } from "motion/react";
 import { format } from "date-fns";
 
 interface WeightChartProps {
@@ -21,6 +22,7 @@ interface WeightChartProps {
 
 export const WeightChart = forwardRef<HTMLDivElement, WeightChartProps>(
   function WeightChart({ data, goalWeight, unit }, ref) {
+  const reducedMotion = useReducedMotion();
   const chartData = data.map((d) => ({
     date: format(d.date, "MMM d"),
     weight: d.weight,
@@ -61,19 +63,19 @@ export const WeightChart = forwardRef<HTMLDivElement, WeightChartProps>(
       <ResponsiveContainer width="100%" height={300}>
         <LineChart
           data={chartData}
-          margin={{ top: 5, right: 80, left: 10, bottom: 5 }}
+          margin={{ top: 12, right: 16, left: 0, bottom: 5 }}
         >
-          <CartesianGrid strokeDasharray="3 3" stroke="#FFD6E0" />
+          <CartesianGrid vertical={false} strokeDasharray="3 5" stroke="#e5dfea" />
           <XAxis
             dataKey="date"
-            stroke="#9A2D47"
-            tick={{ fill: "#9A2D47", fontSize: 12 }}
-            tickLine={{ stroke: "#FFD6E0" }}
+            stroke="#514662"
+            tick={{ fill: "#514662", fontSize: 12 }}
+            tickLine={{ stroke: "#e5dfea" }}
           />
           <YAxis
-            stroke="#9A2D47"
-            tick={{ fill: "#9A2D47", fontSize: 12 }}
-            tickLine={{ stroke: "#FFD6E0" }}
+            stroke="#514662"
+            tick={{ fill: "#514662", fontSize: 12 }}
+            tickLine={{ stroke: "#e5dfea" }}
             domain={[domainMin, domainMax]}
             ticks={ticks}
             tickFormatter={(value) => `${value}`}
@@ -81,12 +83,12 @@ export const WeightChart = forwardRef<HTMLDivElement, WeightChartProps>(
           />
           <Tooltip
             contentStyle={{
-              backgroundColor: "#FFF5F7",
-              border: "1px solid #FFD6E0",
+              backgroundColor: "#faf8ff",
+              border: "1px solid #e5dfea",
               borderRadius: "1rem",
               padding: "8px 12px",
             }}
-            labelStyle={{ color: "#9A2D47", fontWeight: 600 }}
+            labelStyle={{ color: "#514662", fontWeight: 600 }}
             formatter={(value) => [`${value} ${unit}`, "Weight"]}
             labelFormatter={(_, payload) =>
               payload[0]?.payload?.fullDate || ""
@@ -108,11 +110,12 @@ export const WeightChart = forwardRef<HTMLDivElement, WeightChartProps>(
           <Line
             type="monotone"
             dataKey="weight"
-            stroke="#FF85A1"
+            stroke="#8653bd"
             strokeWidth={3}
-            dot={{ fill: "#FF85A1", strokeWidth: 2, r: 4 }}
-            activeDot={{ r: 6, fill: "#FF6B8A" }}
-            animationDuration={800}
+            dot={{ fill: "#8653bd", strokeWidth: 2, r: 4 }}
+            activeDot={{ r: 6, fill: "#593885" }}
+            isAnimationActive={!reducedMotion}
+            animationDuration={750}
             animationEasing="ease-out"
           />
         </LineChart>
