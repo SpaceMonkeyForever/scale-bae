@@ -101,11 +101,46 @@ describe("Progress Page", () => {
     await page.waitForSelector(chartLine);
     expect(await page.$eval(selectedRange, (el) => el.textContent)).toBe("All Time");
 
-    await seedWeightEntries(userId, [{ weight: 71, unit: "kg", daysAgo: 1 }]);
+    await seedWeightEntries(userId, [{ weight: 74.5, unit: "kg", daysAgo: 1 }]);
     await navigateTo(page, "/progress");
     await page.waitForSelector(selectedRange);
     expect(await page.$eval(selectedRange, (el) => el.textContent)).toBe("1 Month");
     expect(await page.$$(SELECTORS.progress.weightListItem)).toHaveLength(3);
+    const change = await page.$eval(SELECTORS.progress.totalChange, (el) => ({
+      value: el.querySelector(".stat-value")?.textContent,
+      detail: el.querySelector(".stat-detail")?.textContent,
+      comparisonDate: el.querySelector("time")?.dateTime,
+    }));
+    expect(change.value).toBe("+3.5 kg");
+    expect(change.detail).toContain("vs. 71.0 kg");
+    expect(Date.parse(change.comparisonDate ?? "")).toBeLessThan(Date.now() - 90 * 24 * 60 * 60 * 1000);
+  });
+
+  it("reveals older history in batches and preserves the comparison on the last visible row", async () => {
+    const username = generateUniqueUsername("long-history");
+    createdUsers.push(username);
+    const userId = await createTestUser(username, TEST_PASSWORD);
+    await seedWeightEntries(userId, Array.from({ length: 21 }, (_, index) => ({
+      weight: 61 - index * 0.2,
+      unit: "kg",
+      daysAgo: index + 1,
+    })));
+    await loginUser(page, username, TEST_PASSWORD);
+    await navigateTo(page, "/progress");
+    const rows = SELECTORS.progress.weightListItem;
+    await page.waitForSelector(rows);
+    expect(await page.$$(rows)).toHaveLength(10);
+    expect(await page.$eval(`${rows}:nth-child(10)`, (el) => el.textContent)).toContain("+0.2");
+
+    const showOlder = page.locator("::-p-aria(Show older weigh-ins)");
+    await showOlder.click();
+    await page.waitForSelector(`${rows}:nth-child(20)`);
+    expect(await page.$$(rows)).toHaveLength(20);
+    await page.waitForFunction((selector) => document.activeElement === document.querySelector(selector), {}, `${rows}:nth-child(11)`);
+    await showOlder.click();
+    await page.waitForSelector(`${rows}:nth-child(21)`);
+    expect(await page.$$(rows)).toHaveLength(21);
+    expect(await page.$("::-p-aria(Show older weigh-ins)")).toBeNull();
   });
 
   describe("With Data", () => {
@@ -349,6 +384,7 @@ describe("Progress Page", () => {
       await page.click(SELECTORS.progress.deleteWeightButton);
       await page.waitForSelector("::-p-aria(Undo)");
       expect(await readWeights()).toHaveLength(1);
+      expect(await page.$eval(`${SELECTORS.progress.totalChange} .stat-value`, el => el.textContent)).toBe("—");
       await page.locator("::-p-aria(Undo)").click();
       await page.waitForFunction(() => document.querySelectorAll('[data-testid="weight-list-item"]').length === 2);
       expect(await readWeights()).toEqual(original);

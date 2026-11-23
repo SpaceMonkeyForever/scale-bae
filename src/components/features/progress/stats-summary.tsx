@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { motion } from "motion/react";
 import { Card } from "@/components/ui/card";
-import { cn, formatDate } from "@/lib/utils";
+import { cn, formatDate, formatWeight } from "@/lib/utils";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -28,6 +28,9 @@ const cardVariants = {
 interface StatsSummaryProps {
   currentWeight?: number;
   latestRecordedAt?: string;
+  previousWeight?: number;
+  previousRecordedAt?: string;
+  change?: number;
   startWeight?: number;
   goalWeight?: number;
   unit: "lb" | "kg";
@@ -37,12 +40,14 @@ interface StatsSummaryProps {
 export function StatsSummary({
   currentWeight,
   latestRecordedAt,
+  previousWeight,
+  previousRecordedAt,
+  change,
   startWeight,
   goalWeight,
   unit,
   totalEntries,
 }: StatsSummaryProps) {
-  const change = currentWeight && startWeight ? currentWeight - startWeight : null;
   const goalProgress =
     currentWeight && startWeight && goalWeight
       ? startWeight === goalWeight
@@ -60,10 +65,12 @@ export function StatsSummary({
     },
     {
       label: "Change",
-      detail: totalEntries > 0 && "Since your first weigh-in",
-      value: change !== null ? `${change > 0 ? "+" : ""}${change.toFixed(1)} ${unit}` : "-",
+      detail: previousWeight !== undefined && previousRecordedAt
+        ? <>vs. {formatWeight(previousWeight, unit)} on <time dateTime={previousRecordedAt}>{formatDate(new Date(previousRecordedAt))}</time></>
+        : totalEntries === 1 && "Log another weigh-in to compare",
+      value: change !== undefined ? `${change > 0 ? "+" : ""}${formatWeight(change, unit)}` : "—",
       image: "/unicorns/chart.png",
-      color: change !== null ? (change < 0 ? "text-mint-500" : "text-bae-600") : undefined,
+      color: change !== undefined ? (change < 0 ? "text-mint-500" : "text-bae-600") : undefined,
       testId: "total-change",
     },
     {

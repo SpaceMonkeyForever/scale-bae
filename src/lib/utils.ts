@@ -51,3 +51,11 @@ export function convertWeight(
 export function weightInUnit(entry: { weight: number; unit: "lb" | "kg" }, unit: "lb" | "kg"): number {
   return Number(convertWeight(entry.weight, entry.unit, unit).toFixed(1));
 }
+
+export function weightChange(
+  current: { weight: number; unit: "lb" | "kg" },
+  previous: { weight: number; unit: "lb" | "kg" }
+): number {
+  const unit = current.unit;
+  return Number((weightInUnit(current, unit) - weightInUnit(previous, unit)).toFixed(1));
+}

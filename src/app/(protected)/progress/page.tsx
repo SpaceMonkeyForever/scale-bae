@@ -6,7 +6,7 @@ import { motion } from "motion/react";
 import { subMonths, subWeeks } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Toast, ToastDescription, ToastProvider, ToastViewport } from "@/components/ui/toast";
-import { formatDate, weightInUnit } from "@/lib/utils";
+import { formatDate, weightChange, weightInUnit } from "@/lib/utils";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { WeightChart } from "@/components/features/progress/weight-chart";
 import { StatsSummary } from "@/components/features/progress/stats-summary";
@@ -167,6 +167,7 @@ export default function ProgressPage() {
     .reverse();
 
   const currentWeight = latestEntry?.weight;
+  const previousEntry = entries[1];
   const firstEntry = entries[entries.length - 1];
   const startWeight = firstEntry ? weightInUnit(firstEntry, unit) : undefined;
 
@@ -220,6 +221,9 @@ export default function ProgressPage() {
         <StatsSummary
           currentWeight={currentWeight}
           latestRecordedAt={latestEntry?.recordedAt}
+          previousWeight={previousEntry ? weightInUnit(previousEntry, unit) : undefined}
+          previousRecordedAt={previousEntry?.recordedAt}
+          change={latestEntry && previousEntry ? weightChange(latestEntry, previousEntry) : undefined}
           startWeight={startWeight}
           goalWeight={goalWeight ?? undefined}
           unit={unit}

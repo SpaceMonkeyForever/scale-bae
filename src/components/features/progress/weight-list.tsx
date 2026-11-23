@@ -1,28 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { motion } from "motion/react";
-import { formatRelativeDate, weightInUnit } from "@/lib/utils";
+import { motion, useReducedMotion } from "motion/react";
+import { cn, formatRelativeDate, weightChange } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import { UnlockedAchievement } from "@/lib/achievement-types";
 
-const listVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.05 },
-  },
-};
+const HISTORY_BATCH_SIZE = 10;
 
 const itemVariants = {
-  hidden: { opacity: 0, x: -10 },
-  visible: {
+  hidden: { opacity: 0, y: 12 },
+  visible: (index: number) => ({
     opacity: 1,
-    x: 0,
-    transition: { duration: 0.2 },
-  },
+    y: 0,
+    transition: { delay: (index % HISTORY_BATCH_SIZE) * 0.04, duration: 0.28, ease: "easeOut" as const },
+  }),
 };
 
 interface WeightEntry {
@@ -49,6 +42,13 @@ function isSameDay(date1: Date, date2: Date): boolean {
 
 export function WeightList({ entries, achievements = [], onDelete }: WeightListProps) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [visibleCount, setVisibleCount] = useState(HISTORY_BATCH_SIZE);
+  const firstRevealedEntry = useRef<HTMLDivElement>(null);
+  const reducedMotion = useReducedMotion();
+
+  useEffect(() => {
+    firstRevealedEntry.current?.focus();
+  }, [visibleCount]);
 
   const handleDelete = async (id: string) => {
     setDeletingId(id);
@@ -70,24 +70,24 @@ export function WeightList({ entries, achievements = [], onDelete }: WeightListP
   }
 
   return (
-    <motion.div
-      data-testid="weight-list"
-      className="space-y-2"
-      variants={listVariants}
-      initial="hidden"
-      animate="visible"
-    >
-      {entries.map((entry, index) => {
+    <div data-testid="weight-list" className="space-y-2">
+      {entries.slice(0, visibleCount).map((entry, index) => {
         const prevEntry = entries[index + 1];
-        const change = prevEntry ? entry.weight - weightInUnit(prevEntry, entry.unit) : null;
+        const change = prevEntry ? weightChange(entry, prevEntry) : null;
         const dayAchievements = getAchievementsForDate(entry.recordedAt);
+        const firstRevealed = visibleCount > HISTORY_BATCH_SIZE && index === visibleCount - HISTORY_BATCH_SIZE;
 
         return (
           <motion.div
             key={entry.id}
+            ref={firstRevealed ? firstRevealedEntry : undefined}
+            tabIndex={firstRevealed ? -1 : undefined}
+            custom={index}
             variants={itemVariants}
+            initial={reducedMotion ? false : "hidden"}
+            animate="visible"
             data-testid="weight-list-item"
-            className="flex items-center justify-between p-4 bg-white rounded-[var(--radius-bae)] border border-bae-100 hover:border-bae-200 transition-colors"
+            className="flex items-center justify-between p-4 bg-white rounded-[var(--radius-bae)] border border-bae-100 hover:border-bae-200 transition-colors scroll-mt-28"
           >
             <div className="flex items-center gap-4">
               <div className="text-lg font-semibold text-bae-700">
@@ -158,6 +158,14 @@ export function WeightList({ entries, achievements = [], onDelete }: WeightListP
           </motion.div>
         );
       })}
-    </motion.div>
+      {entries.length > visibleCount && (
+        <div className="flex flex-wrap items-center justify-between gap-2 pt-2">
+          <p className="text-sm text-bae-600">Showing {visibleCount} of {entries.length} weigh-ins</p>
+          <Button variant="secondary" onClick={() => setVisibleCount((count) => count + HISTORY_BATCH_SIZE)}>
+            Show older weigh-ins
+          </Button>
+        </div>
+      )}
+    </div>
   );
 }
