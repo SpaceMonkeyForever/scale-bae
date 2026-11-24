@@ -31,3 +31,18 @@ test("clarification does not change the book; a complete opening statement appli
   assert.equal(totals(result.budget).remaining,85000);
   assert.deepEqual(book,emptyBudget());
 });
+test("a malformed paid bill gets one repair attempt and never becomes a partial save", async () => {
+  const book = emptyBudget();
+  const input = {budget:book,today,turns:[{role:"user",content:"Rent is paid."}],interfaceLocale:"id-ID"};
+  const invalid = {mode:"update",language:"id",reply:"Sudah.",changes:[
+    {action:"add",target:"basic",name:"Sewa",status:"paid",amount:50000}]};
+  let attempts = 0;
+  const result = await budgetTurn(input,async () => {
+    attempts++;
+    return {stop_reason:"end_turn",content:[{type:"text",text:JSON.stringify(invalid)}]};
+  });
+  assert.equal(attempts,2);
+  assert.equal(result.mode,"clarify");
+  assert.equal(result.budget,undefined);
+  assert.deepEqual(book,emptyBudget());
+});
