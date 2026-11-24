@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -8,6 +8,17 @@ import { Button } from "@/components/ui/button";
 import { DisplayNameEditor } from "@/components/features/user/display-name-editor";
 import { Brand } from "@/components/layout/brand";
 import { isAdmin } from "@/lib/admin";
+
+import { preferredLocale, storedLocale, saveLocale } from "../../../public/budget/preference.mjs";
+
+function subscribeToLanguage(refresh: () => void) {
+  window.addEventListener("scale-bae-language", refresh);
+  window.addEventListener("storage", refresh);
+  return () => {
+    window.removeEventListener("scale-bae-language", refresh);
+    window.removeEventListener("storage", refresh);
+  };
+}
 
 interface HeaderProps {
   username?: string;
@@ -40,34 +51,44 @@ export function Header({ username, displayName }: HeaderProps) {
     }
   };
 
+  const account = username || "";
+  const locale = useSyncExternalStore(
+    subscribeToLanguage,
+    () => storedLocale(account, currentDisplayName),
+    () => preferredLocale(currentDisplayName?.trim().toLowerCase() === "squishy" ? currentDisplayName : account, null)
+  );
+  const indonesian = locale === "id-ID";
   const navLinks = [
-    { href: "/upload", label: "Upload" },
-    { href: "/progress", label: "Progress" },
-    { href: "/budget", label: "Budget" },
+    { href: "/upload", label: indonesian ? "Unggah" : "Upload" },
+    { href: "/progress", label: indonesian ? "Progres" : "Progress" },
+    { href: "/budget", label: indonesian ? "Anggaran" : "Budget" },
     ...(isAdmin(username) ? [{ href: "/admin", label: "Admin" }] : []),
   ];
+  const activeSection = pathname === "/confirm" ? "/upload" : pathname;
 
+  // Opening or leaving the book across a document boundary keeps Back in sync with saved edits.
+  const HomeLink = pathname === "/budget" ? "a" : Link;
   const greeting = currentDisplayName || username;
 
   return (
-    <header className="journal-header sticky top-0 z-50">
+    <header lang={locale} className="journal-header sticky top-0 z-50">
       <div className="journal-nav">
-        <Link href="/upload" aria-label="Scale Bae home" className="journal-brand">
+        <HomeLink href="/upload" aria-label={indonesian ? "Beranda Scale Bae" : "Scale Bae home"} className="journal-brand">
           <Brand />
-        </Link>
+        </HomeLink>
 
-        <nav className="flex items-center gap-1">
+        <nav aria-label={indonesian ? "Navigasi utama" : "Main navigation"} className="flex items-center gap-1">
           {navLinks.map((link) => {
-            const NavLink = link.href === "/budget" ? "a" : Link;
+            const NavLink = link.href === "/budget" ? "a" : HomeLink;
             return <NavLink
               key={link.href}
               href={link.href}
-              aria-current={pathname === link.href ? "page" : undefined}
+              aria-current={activeSection === link.href ? "page" : undefined}
               className={cn(
                 "px-3 sm:px-4 py-2 rounded-[var(--radius-bae)] text-sm font-medium transition-colors",
                 "hover:bg-bae-100",
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-bae-500 focus-visible:ring-offset-2",
-                pathname === link.href
+                activeSection === link.href
                   ? "bg-bae-100 text-bae-700"
                   : "text-bae-600"
               )}
@@ -78,6 +99,15 @@ export function Header({ username, displayName }: HeaderProps) {
         </nav>
 
         <div className="flex items-center gap-2 sm:gap-3">
+          <select
+            className="journal-language"
+            aria-label={indonesian ? "Bahasa navigasi dan anggaran" : "Navigation and budget language"}
+            value={locale}
+            onChange={event => saveLocale(account, event.target.value)}
+          >
+            <option value="id-ID" lang="id">Bahasa Indonesia</option>
+            <option value="en-GB" lang="en">English</option>
+          </select>
           {greeting && (
             <div className="relative">
               <button
@@ -89,7 +119,7 @@ export function Header({ username, displayName }: HeaderProps) {
                   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-bae-500 rounded"
                 )}
               >
-                <span data-testid="display-name">Hey, {greeting}!</span>
+                <span data-testid="display-name">{indonesian ? "Hai" : "Hey"}, {greeting}!</span>
               </button>
               {isEditing && (
                 <DisplayNameEditor
@@ -101,7 +131,7 @@ export function Header({ username, displayName }: HeaderProps) {
             </div>
           )}
           <Button data-testid="logout-button" variant="ghost" size="sm" onClick={handleLogout}>
-            Logout
+            {indonesian ? "Keluar" : "Logout"}
           </Button>
         </div>
       </div>

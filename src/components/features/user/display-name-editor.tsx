@@ -5,12 +5,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 interface DisplayNameEditorProps {
+  indonesian?: boolean;
   currentName: string;
   onSave: (name: string) => Promise<void>;
   onCancel: () => void;
 }
 
 export function DisplayNameEditor({
+  indonesian = false,
   currentName,
   onSave,
   onCancel,
@@ -31,13 +33,13 @@ export function DisplayNameEditor({
     <div className="absolute top-full right-0 mt-2 p-4 bg-white rounded-[var(--radius-bae)] shadow-bae-lg border border-bae-200 z-50 min-w-[250px]">
       <div className="space-y-3">
         <label className="block text-sm font-medium text-bae-700">
-          What should I call you?
+          {indonesian ? "Mau dipanggil apa?" : "What should I call you?"}
         </label>
         <Input
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder="Enter your name"
+          placeholder={indonesian ? "Masukkan nama" : "Enter your name"}
           maxLength={50}
           autoFocus
         />
@@ -48,7 +50,7 @@ export function DisplayNameEditor({
             disabled={isSaving}
             className="flex-1"
           >
-            {isSaving ? "Saving..." : "Save"}
+            {isSaving ? (indonesian ? "Menyimpan…" : "Saving...") : (indonesian ? "Simpan" : "Save")}
           </Button>
           <Button
             variant="secondary"
@@ -57,7 +59,7 @@ export function DisplayNameEditor({
             disabled={isSaving}
             className="flex-1"
           >
-            Cancel
+            {indonesian ? "Batal" : "Cancel"}
           </Button>
         </div>
       </div>

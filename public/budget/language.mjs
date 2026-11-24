@@ -114,10 +114,7 @@ const indonesia = {
 };
 export let locale = "en-GB";
 export function setLocale(value) { locale = value === "id-ID" ? "id-ID" : "en-GB"; }
-export function preferredLocale(username, savedPreference) {
-  if (["en-GB","id-ID"].includes(savedPreference)) return savedPreference;
-  return username.trim().toLowerCase() === "squishy" ? "id-ID" : "en-GB";
-}
+export { preferredLocale } from "./preference.mjs";
 export function t(source, values = {}) {
   const text = locale === "id-ID" && Object.hasOwn(indonesia, source) ? indonesia[source] : source;
   return text.replace(/\{(\w+)\}/g, (match, key) => Object.hasOwn(values, key) ? values[key] : match);

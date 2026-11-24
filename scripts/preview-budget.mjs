@@ -7,7 +7,7 @@ import { anthropicMessage, budgetTurn } from "./budget-agent.mjs";
 const pages = new Map([
   ["/budget", ["../examples/budget/index.html", "text/html"]],
   ["/budget/", ["../examples/budget/index.html", "text/html"]],
-  ...["style.css", "page.js", "budget.mjs", "language.mjs", "voice.js", "icons.js"].map(file => ["/budget/" + file, ["../public/budget/" + file, file.endsWith(".css") ? "text/css" : "text/javascript"]]),
+  ...["style.css", "page.js", "budget.mjs", "language.mjs", "preference.mjs", "voice.js", "icons.js"].map(file => ["/budget/" + file, ["../public/budget/" + file, file.endsWith(".css") ? "text/css" : "text/javascript"]]),
   ["/brand/scale-bae.svg", ["../public/brand/scale-bae.svg", "image/svg+xml"]],
   ["/unicorns/dedicated.png", ["../public/unicorns/dedicated.png", "image/png"]]
 ]);
@@ -43,7 +43,11 @@ export function startPreview(sendMessage = anthropicMessage, port = Number(proce
     const asset = pages.get(path);
     if (!asset || !["GET","HEAD"].includes(request.method)) { response.writeHead(404).end(); return; }
     try {
-      const bytes = await readFile(new URL(asset[0], import.meta.url));
+      let bytes = await readFile(new URL(asset[0], import.meta.url));
+      if (asset[1] === "text/html") {
+        const book = await readFile(new URL("../examples/budget/book.html", import.meta.url), "utf8");
+        bytes = Buffer.from(bytes.toString("utf8").replace("<!-- budget book -->", () => book));
+      }
       response.writeHead(200, {"content-type":asset[1], "cache-control":"no-store", "x-content-type-options":"nosniff"});
       response.end(request.method === "HEAD" ? undefined : bytes);
     } catch { response.writeHead(500).end(); }

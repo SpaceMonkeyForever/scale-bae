@@ -160,6 +160,8 @@
 .journal-header { background: #fffcf8f2; border-bottom: 1px solid #ded7e2; backdrop-filter: blur(12px); }
 .journal-nav, .journal-main { width: min(100% - 2.5rem, 71rem); margin: auto; }
 .journal-nav { display: flex; align-items: center; justify-content: space-between; gap: .4rem; min-height: 4.5rem; }
+.journal-language { max-width: 10rem; min-height: 2.5rem; padding-inline: .55rem; font-size: .875rem; color: #583b68; cursor: pointer; }
+.journal-language:focus-visible { outline: 2px solid #7551a3; outline-offset: 2px; }
 .journal-nav nav a { border-radius: 2rem; }
 .journal-nav nav [aria-current=page] { background: #382b4b; color: #fffaf8; }
 .journal-main { padding-block: clamp(1.25rem, 4vw, 3.5rem); }
@@ -273,9 +275,13 @@
   .journal-cover--progress .cover-sky { left: 49%; }
   .progress-log { left: 1.2rem; }
 }
-@media (max-width: 370px) {
+@media (max-width: 640px) {
   .journal-nav { flex-wrap: wrap; row-gap: .25rem; padding-block: .5rem; }
   .journal-nav nav { order: 1; width: 100%; }
+  .journal-nav nav a { min-height: 44px; display: inline-flex; align-items: center; }
+  .journal-language { max-width: 8.5rem; min-height: 44px; }
+}
+@media (max-width: 370px) {
   .journal-stat { padding: .8rem; }
   .journal-stat img { width: 2.8rem; height: 2.8rem; }
   .progress-layout .grid { min-width: 0; }

@@ -1,0 +1,56 @@
+  <main id="main" class="wrap">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-copy"><span class="period"><i data-icon="calendar"></i><span id="period"></span></span>
+        <h1 id="hero-title">My budget <em>book.</em></h1>
+        <p>What’s paid, what’s set aside, and what’s left.</p>
+      </div>
+      <div class="stationery" aria-hidden="true"><span class="back-paper"></span><span class="sheet"></span><span class="tape"></span><span class="postmark">♥</span><img src="/unicorns/dedicated.png" alt="" width="168" height="168"><span class="spark a">✧</span><span class="spark b">✦</span><span class="spark c">✧</span></div>
+    </section>
+    <div class="board">
+      <section class="card talk" aria-labelledby="talk-title">
+        <div class="eyebrow"><span class="ink-dot"></span> Budget check-in</div>
+        <h2 id="talk-title">Tell me what <em>changed.</em></h2>
+        <p class="lead">A bill paid, a little extra spent, or money from Squeezy.</p>
+        <button class="mic-button" data-do="talk"><i data-icon="mic"></i> Talk to your budget <span class="wave" aria-hidden="true"><b></b><b></b><b></b><b></b><b></b><b></b><b></b></span></button>
+        <button class="type-button" data-do="type"><i data-icon="pen"></i> Type instead</button>
+        <select id="agent-language" aria-label="Speech recognition language" title="Speech language">
+          <option value="">Use interface language</option><option value="device">Device language</option><option value="en-GB">English (UK)</option><option value="en-US">English (US)</option>
+          <option value="id-ID">Bahasa Indonesia</option><option value="fil-PH">Filipino</option><option value="ar-EG">العربية (مصر)</option>
+          <option value="ar-SA">العربية (السعودية)</option><option value="es-ES">Español</option><option value="fr-FR">Français</option>
+        </select>
+        <div id="agent-panel" hidden>
+          <div class="agent-line"><p id="agent-prompt" role="status"></p><button id="agent-cancel" class="small-action">Cancel</button></div>
+          <p id="agent-status" class="inline-msg" role="status"></p>
+          <button id="agent-mic" class="small-action" hidden>Try microphone again</button>
+          <form id="agent-form" hidden><label for="agent-input">Your words</label>
+            <input id="agent-input" maxlength="1800" autocomplete="off" required>
+            <button class="primary">Send</button>
+          </form>
+        </div>
+        <div id="agent-receipt" hidden><span id="agent-feedback" role="status"></span> <button id="agent-undo" class="small-action" hidden>Undo</button></div>
+        <!-- demo --><div class="try"><span>Try an example</span><button data-demo="repair">Bike repair <i data-icon="arrow-up-right"></i></button><button data-demo="electricity">Bill paid <i data-icon="arrow-up-right"></i></button><button data-demo="topup">Top-up <i data-icon="arrow-up-right"></i></button></div><!-- /demo -->
+      </section>
+      <aside class="receipt" aria-label="Your money">
+        <div class="receipt-inner">
+          <section id="bank-check" aria-labelledby="bank-heading" hidden>
+            <h2 class="eyebrow" id="bank-heading"><i data-icon="wallet"></i> In your bank</h2>
+            <p id="bank-amount"></p>
+            <p class="balance-hint">Last reported <time id="bank-date"></time> · Private check-in</p>
+          </section>
+          <div class="receipt-kicker"><span class="eyebrow">Squeezy’s budget</span><button class="icon-button" data-do="allocation" aria-label="Edit budget allocation and dates" title="Edit allocation"><i data-icon="pen"></i></button></div>
+          <h2 id="receipt-title"><span id="balance"></span> <em id="balance-label"></em></h2>
+          <p class="balance-hint" id="balance-hint"></p>
+          <dl id="math"></dl>
+          <button class="share-button" data-do="share"><i data-icon="letter"></i> Share with Squeezy <i data-icon="arrow-right"></i></button>
+        </div>
+      </aside>
+      <section class="card basics" id="basics" aria-labelledby="basics-title">
+        <div class="section-head"><div><h2 id="basics-title">The basics</h2><p>Your regular costs and how far they’re covered.</p></div><button class="small-action" data-do="add-basic"><i data-icon="plus"></i> Add</button></div>
+        <div id="basic-list" class="list"></div>
+      </section>
+      <section class="card extras" aria-labelledby="extra-title"><div class="section-head"><div><h2 id="extra-title">Outside the plan</h2><p>The extras you’d like Squeezy to know about.</p></div><button class="small-action" data-do="add-extra"><i data-icon="plus"></i> Add</button></div><div id="extra-list" class="list"></div></section>
+    </div>
+    <!-- demo --><footer><span><span class="sample-dot"></span> Sample budget · saved in this tab</span><button data-do="reset">Reset example</button></footer><!-- /demo -->
+  </main>
+  <dialog id="editor" aria-labelledby="dialog-title"><div class="dialog-inner"><button id="close" class="icon-button close" aria-label="Close"><i data-icon="x"></i></button><div id="dialog-body"></div></div></dialog>
+  <div id="toast" class="toast" role="status"></div>

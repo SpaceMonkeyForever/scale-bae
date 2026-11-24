@@ -1,14 +1,13 @@
 import { locale, t } from "./language.mjs";
 
-const $ = id => document.getElementById(id);
-const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-const language = $("agent-language");
-try {
-  const saved = sessionStorage.getItem("budget-speech-language");
-  if (saved !== null) language.value = saved || "device";
-} catch { /* Optional preference. */ }
-
-export function budgetConversation({readBudget, readRevision, onConflict, applyBudget, openShare}) {
+export function budgetConversation({root, readBudget, readRevision, onConflict, applyBudget, openShare}) {
+  const $ = id => root.querySelector("#" + id);
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const language = $("agent-language");
+  try {
+    const saved = sessionStorage.getItem("budget-speech-language");
+    if (saved !== null) language.value = saved || "device";
+  } catch { /* Optional preference. */ }
   let active, mic, previous;
   let history = [];
   const uiMessages = new Map();
@@ -188,5 +187,9 @@ export function budgetConversation({readBudget, readRevision, onConflict, applyB
     if (mic && active) listen(active);
   };
   window.addEventListener("pagehide",cancel);
-  return {start, cancel, forget, refreshLanguage};
+  function dispose() {
+    cancel();
+    window.removeEventListener("pagehide",cancel);
+  }
+  return {start, cancel, forget, refreshLanguage, dispose};
 }

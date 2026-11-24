@@ -1,6 +1,7 @@
 .share-button:disabled, .nav-share:disabled { opacity: .55; cursor: default; }
 * { box-sizing: border-box; }
-:root {
+:host { display: block; min-height: calc(100svh - 4.5rem); }
+:root, :host {
   --ink: #352a41; --muted: #6e6374; --plum: #694979; --deep: #493151; --line: #e3dce3;
   --cream: #fcf9f5; --serif: Georgia, "Times New Roman", serif;
   color: var(--ink); font: 16px/1.45 "Segoe UI", system-ui, sans-serif; background: var(--cream);
