@@ -43,6 +43,7 @@ export function Header({ username, displayName }: HeaderProps) {
   const navLinks = [
     { href: "/upload", label: "Upload" },
     { href: "/progress", label: "Progress" },
+    { href: "/budget", label: "Budget" },
     ...(isAdmin(username) ? [{ href: "/admin", label: "Admin" }] : []),
   ];
 
@@ -56,8 +57,9 @@ export function Header({ username, displayName }: HeaderProps) {
         </Link>
 
         <nav className="flex items-center gap-1">
-          {navLinks.map((link) => (
-            <Link
+          {navLinks.map((link) => {
+            const NavLink = link.href === "/budget" ? "a" : Link;
+            return <NavLink
               key={link.href}
               href={link.href}
               aria-current={pathname === link.href ? "page" : undefined}
@@ -71,8 +73,8 @@ export function Header({ username, displayName }: HeaderProps) {
               )}
             >
               {link.label}
-            </Link>
-          ))}
+            </NavLink>;
+          })}
         </nav>
 
         <div className="flex items-center gap-2 sm:gap-3">

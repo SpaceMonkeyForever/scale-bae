@@ -60,6 +60,12 @@ export const activityLog = sqliteTable("activity_log", {
     .default(sql`(unixepoch())`),
 });
 
+export const budgetBooks = sqliteTable("budget_books", {
+  userId: text("user_id").primaryKey().references(() => users.id, { onDelete: "cascade" }),
+  revision: integer("revision").notNull(),
+  book: text("book").notNull(),
+});
+
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 export type Weight = typeof weights.$inferSelect;

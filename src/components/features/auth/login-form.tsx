@@ -38,8 +38,12 @@ export function LoginForm() {
         return;
       }
 
-      router.push("/upload");
-      router.refresh();
+      if (new URLSearchParams(window.location.search).get("next") === "/budget") {
+        window.location.assign("/budget");
+      } else {
+        router.push("/upload");
+        router.refresh();
+      }
     } catch {
       setError("Failed to connect to server");
     } finally {
