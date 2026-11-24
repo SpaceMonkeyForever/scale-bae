@@ -2,6 +2,8 @@ import { getSession } from "@/services/auth";
 import { input, json, readBudget, revisionSchema } from "@/services/budget";
 import { anthropicMessage, budgetTurn } from "../../../../scripts/budget-agent.mjs";
 
+import { englishShare } from "../../../../scripts/budget-share.mjs";
+
 // The single app process shares these limits across signed-in tabs.
 const inFlight = new Set<string>();
 const recent = new Map<string, number[]>();
@@ -22,10 +24,14 @@ export async function POST(request:Request) {
   if (!user.isLoggedIn || !user.userId) return json(null,401);
   const body = await input(request).catch(() => null);
   if (!revisionSchema.safeParse(body?.revision).success) return json(null,400);
-  const current = readBudget(user.userId);
+  const current = readBudget(user.userId,user);
   if (current.revision !== body.revision) return json(current,409);
   if (!admit(user.userId)) return json(null,429);
   try {
+    if (body.intent === "englishShare") {
+      return json(await englishShare(current.budget, anthropicMessage,
+        AbortSignal.any([request.signal, AbortSignal.timeout(90000)])));
+    }
     const result = await budgetTurn({...body,budget:current.budget},anthropicMessage,
       AbortSignal.any([request.signal,AbortSignal.timeout(45000)]));
     return json(result);

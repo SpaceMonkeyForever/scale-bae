@@ -11,7 +11,7 @@ export const metadata = { title: "My budget book · scale-bae" };
 export default async function BudgetPage() {
   const session = await getSession();
   if (!session.isLoggedIn || !session.userId || !session.username) redirect("/login?next=/budget");
-  const book = readBudget(session.userId);
+  const book = readBudget(session.userId,session);
   const template = await readFile(join(process.cwd(), "examples/budget/book.html"), "utf8");
   const markup = '<link rel="stylesheet" href="/budget/style.css">' + template.replace(/<!-- demo -->[\s\S]*?<!-- \/demo -->/g, "");
   return (

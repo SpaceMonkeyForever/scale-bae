@@ -1,4 +1,4 @@
-import { sample, hasPeriod, totals, money, cycle, coverage, letter, shareIntro, examples, dateLabel, itemText } from "./budget.mjs";
+import { sample, hasPeriod, totals, money as formatMoney, cycle, coverage, letterFromReport, currencies, hasAmounts, maxMinor, examples, dateLabel, itemText } from "./budget.mjs";
 import { locale, t, setLocale, bindShell } from "./language.mjs";
 import { icon } from "./icons.js";
 import { budgetConversation } from "./voice.js";
@@ -21,6 +21,10 @@ export function mountBudget(root, live) {
   if (!live) {
     try { budget = JSON.parse(sessionStorage.getItem(storageKey)) || budget; } catch { /* Offline preview. */ }
   }
+  const money = value => formatMoney(value, budget.currency);
+  const currencySelect = $("#budget-currency");
+  const shareDrafts = new WeakMap();
+  let shareRequest;
   let saving = false;
   const dialog = $("#editor");
   let toastTimer;
@@ -85,6 +89,10 @@ export function mountBudget(root, live) {
   function render() {
     const summary = totals(budget), r = summary.remaining;
     const ready = hasPeriod(budget);
+    const names = new Intl.DisplayNames([locale], {type:"currency"});
+    currencySelect.replaceChildren(...currencies.map(code => new Option(code + " · " + names.of(code), code)));
+    currencySelect.value = budget.currency || "GBP";
+    $("#currency-notice").hidden = !(live?.showCurrencyNotice && revision === live.revision && budget.currency === "IDR");
     $(".talk .lead").textContent = t(ready ? "A bill paid, a little extra spent, or money from Squeezy." :
       "Tell me how much Squeezy gave you, when it’s for, and which bills are paid or still due.");
     $("#period").textContent = ready ? cycle(budget) : t("Getting started");
@@ -103,6 +111,7 @@ export function mountBudget(root, live) {
     $("#extra-list").innerHTML = budget.extras.map(x=>row(x,"extra")).join("") || '<p class="empty">'+t("No extras this period.")+'</p>';
   }
   function openBody(content) {
+    shareRequest?.abort();
     agent.cancel();
     $("#dialog-body").innerHTML = content;
     if (!dialog.open) dialog.showModal();
@@ -116,14 +125,14 @@ export function mountBudget(root, live) {
   function field(label, name, type, value, attributes = "") {
     return '<label>'+t(label)+'<input name="'+name+'" type="'+type+'" value="'+escape(value)+'" '+attributes+'></label>';
   }
-  const amountField = (label, value, allowZero=false) => field(label,"amount","number",value == null ? "" : value/100,'inputmode="decimal" step=".01" min="'+(allowZero ? '0':'0.01')+'" max="99999999" required');
+  const amountField = (label, value, allowZero=false) => field(label,"amount","number",value == null ? "" : value/100,'inputmode="decimal" step=".01" min="'+(allowZero ? '0':'0.01')+'" max="'+(maxMinor / 100)+'" required');
   const getAmount = data => Math.round(Number(data.get("amount")) * 100);
   const collections = {basic:"basics", extra:"extras", topup:"topups"};
   function editEntry(kind, entry={}) {
     const basic = kind === "basic", extra = kind === "extra", isExisting = Boolean(entry.id);
     const title = basic ? (isExisting ? "Edit a basic" : "Add a basic") : extra ? (isExisting ? "Edit an extra" : "Add an extra") : (isExisting ? "Edit a top-up" : "Add a top-up");
-    const amountLabel = basic ? "Amount from this budget (£)" : "Amount (£)";
-    const subtitle = basic ? "Use the cost for this whole period. Enter £0 if an earlier budget covered it." : extra ? "Keep the reason in your own words for Squeezy." : "This is added to the original allocation.";
+    const amountLabel = t(basic ? "Amount from this budget ({currency})" : "Amount ({currency})", {currency:budget.currency || "GBP"});
+    const subtitle = basic ? t("Use the cost for this whole period. Enter {zero} if an earlier budget covered it.", {zero:money(0)}) : extra ? "Keep the reason in your own words for Squeezy." : "This is added to the original allocation.";
     openBody(heading("My budget book",title,subtitle)+'<form id="entry-form">'+field(basic ? "Basic" : extra ? "What was it?" : "Top-up note","name","text",itemText(entry,"name"),'required maxlength="100"')+amountField(amountLabel,entry.amount,basic)+
       (basic ? '<label>'+t("How is it covered?")+'<select name="status"><option value="planned">'+t("Still to cover")+'</option><option value="reserved">'+t("Money set aside")+'</option><option value="paid">'+t("Already paid")+'</option></select></label>'+field("Covered through","until","date",entry.until || "") :
        extra ? '<label>'+t("Why was it outside the plan?")+'<textarea name="reason" required maxlength="400">'+escape(itemText(entry,"reason"))+'</textarea></label>' : "")+
@@ -157,35 +166,61 @@ export function mountBudget(root, live) {
     };
   }
   function allocation() {
-    openBody(heading("From Squeezy","Your allocation","The original amount and how long it needs to last.")+'<form id="allocation-form">'+amountField("Original amount (£)",budget.allocated,true)+'<div class="field-pair">'+field("From","start","date",budget.start,"required")+field("Through","end","date",budget.end,"required")+'</div><div class="dialog-actions"><button type="button" class="secondary" data-cancel>'+t("Cancel")+'</button><button class="primary">'+t("Save allocation")+'</button></div></form><div class="section-head topup-heading"><strong>'+t("Later top-ups")+'</strong><button class="small-action" id="new-topup">'+icon("plus")+' '+t("Add")+'</button></div>'+budget.topups.map(x=>row(x,"topup")).join(""));
+    openBody(heading("From Squeezy","Your allocation","The original amount and how long it needs to last.")+'<form id="allocation-form">'+amountField(t("Original amount ({currency})", {currency:budget.currency || "GBP"}),budget.allocated,true)+'<div class="field-pair">'+field("From","start","date",budget.start,"required")+field("Through","end","date",budget.end,"required")+'</div><div class="dialog-actions"><button type="button" class="secondary" data-cancel>'+t("Cancel")+'</button><button class="primary">'+t("Save allocation")+'</button></div></form><div class="section-head topup-heading"><strong>'+t("Later top-ups")+'</strong><button class="small-action" id="new-topup">'+icon("plus")+' '+t("Add")+'</button></div>'+budget.topups.map(x=>row(x,"topup")).join(""));
     const form = $("#allocation-form");
     const constrain = () => { form.elements.end.min = form.elements.start.value; };
     constrain(); form.elements.start.oninput = constrain;
     form.onsubmit = e => { e.preventDefault(); const data=new FormData(form); persist("Allocation updated",{...budget,start:data.get("start"),end:data.get("end"),allocated:getAmount(data)}); };
     $("#new-topup").onclick = () => editEntry("topup",{name:t("From Squeezy")});
   }
-  function shareSummary() {
+  currencySelect.onchange = async () => {
+    const currency = currencySelect.value;
+    currencySelect.value = budget.currency || "GBP";
+    if (currency === currencySelect.value) return;
+    agent.cancel();
+    const save = () => persist("Currency updated", {...budget, currency});
+    if (!hasAmounts(budget)) { await save(); return; }
+    const example = budget.allocated || budget.bank?.amount || budget.basics[0]?.amount || 1000;
+    openBody(heading("Budget currency", "Change currency?", t("Keep the same numbers in {currency}? For example, {before} becomes {after}. No exchange rate is applied.",
+      {currency, before:money(example), after:formatMoney(example, currency)})) +
+      '<div class="dialog-actions"><button class="secondary" data-cancel>'+t("Cancel")+'</button><button class="primary" id="change-currency">'+t("Change currency")+'</button></div>');
+    $("#change-currency").onclick = save;
+  };
+  async function shareSummary() {
     if (!hasPeriod(budget)) { toast(t("Add your allocation and its dates to see what’s left.")); return; }
-    const message = letter(budget);
-    const summary = totals(budget);
-    const summaryRows = [
-      mathRow(t("Original allocation"), money(budget.allocated)),
-      ...budget.topups.map(x => mathRow(t("Top-up") + " · " + escape(x.name), "+" + money(x.amount))),
-      mathRow(t("Basics for the period"), "−" + money(summary.basics)),
-      mathRow(t("Outside the plan"), "−" + money(summary.extras)),
-      mathRow(t(summary.remaining < 0 ? "Top-up needed" : "Left over"), money(Math.abs(summary.remaining)))
-    ].join("");
-    function details(item, note) {
-      return '<li><div><strong>' + escape(itemText(item,"name")) + '</strong><span>' +
-        money(item.amount) + '</span></div><small>' + escape(note) + '</small></li>';
+    const snapshot = budget;
+    let report = shareDrafts.get(snapshot);
+    if (!report) {
+      openBody(heading("For Squeezy","Your budget update") + '<p role="status">'+t("Preparing your English message…")+'</p>');
+      const controller = new AbortController();
+      shareRequest = controller;
+      try {
+        const response = await fetch("/budget/turn", {method:"POST", signal:controller.signal, headers:{"content-type":"application/json"},
+          body:JSON.stringify({intent:"englishShare", ...(live ? {revision} : {budget:snapshot})})});
+        if (controller.signal.aborted || !dialog.open || budget !== snapshot) return;
+        if (response.status === 409) { syncConflict(await response.json()); return; }
+        if (!response.ok) throw new Error();
+        report = await response.json();
+        if (controller.signal.aborted || !dialog.open || budget !== snapshot) return;
+        shareDrafts.set(snapshot, report);
+      } catch {
+        if (!controller.signal.aborted && dialog.open && budget === snapshot) {
+          openBody(heading("For Squeezy","Your budget update","Couldn’t prepare the English message. Please try again.") +
+            '<button class="primary" data-do="share">'+t("Try again")+'</button>');
+        }
+        return;
+      } finally { if (shareRequest === controller) shareRequest = undefined; }
     }
-    const article = '<article class="letter" id="letter"><span class="letter-date">' + cycle(budget) +
-      '</span><h3>'+t("Hi Squeezy,")+'</h3><p>' + escape(shareIntro(summary.remaining)) + '</p><dl>' +
-      summaryRows + '</dl><h4>'+t("Outside the plan")+'</h4><ul>' +
-      budget.extras.map(x => details(x, itemText(x,"reason"))).join("") +
-      '</ul>' + (budget.extras.length ? '' : '<p>'+t("No extras this period.")+'</p>') +
-      '<h4>'+t("The basics")+'</h4><ul>' + budget.basics.map(x => details(x, coverage(x, true))).join("") +
-      '</ul></article>';
+    const message = letterFromReport(report);
+    function details([name, amount, note]) {
+      return '<li><div><strong>' + escape(name) + '</strong><span>' + escape(amount) + '</span></div><small>' + escape(note) + '</small></li>';
+    }
+    const article = '<article lang="en-GB" class="letter" id="letter"><span class="letter-date">' + escape(report.period) +
+      '</span><h3>Hi Squeezy,</h3><p>' + escape(report.intro) + '</p><dl>' +
+      report.rows.map(([label, value]) => mathRow(escape(label), escape(value))).join("") +
+      '</dl><h4>Outside the plan</h4><ul>' + report.extras.map(details).join("") + '</ul>' +
+      (report.extras.length ? '' : '<p>No extras this period.</p>') +
+      '<h4>The basics</h4><ul>' + report.basics.map(details).join("") + '</ul></article>';
     openBody(heading("For Squeezy","Your budget update","Read it through, then choose where to send it.") + article +
       '<div class="share-footer"><div id="share-status" class="inline-msg" role="status"></div><div class="dialog-actions"><button id="copy" class="secondary">'+t("Copy message")+'</button>' +
       (typeof navigator.share === "function" ? '<button id="share" class="primary">'+t("Share…")+'</button>' : "") + '</div></div>');
@@ -214,11 +249,13 @@ export function mountBudget(root, live) {
   const onClick = e => {
     const button=e.target.closest("button"); if (!button) return;
     if (button.hasAttribute("data-cancel") || button.id === "close") { dialog.close(); return; }
-    if (button.dataset.demo) { agent.start(false, t(examples[button.dataset.demo])); return; }
+    if (button.dataset.demo) { agent.start(false, t(examples[button.dataset.demo], {amount:money((budget.currency === "IDR" ? 1000 : 1) * (button.dataset.demo === "repair" ? 9500 : 10000))})); return; }
     if (button.dataset.kind) { const kind=button.dataset.kind; editEntry(kind,budget[collections[kind]].find(x=>x.id === button.dataset.id)); return; }
     const actions={share:shareSummary,talk:()=>agent.start(true),type:()=>agent.start(false),allocation,reset,"add-basic":()=>editEntry("basic"),"add-extra":()=>editEntry("extra")};
     actions[button.dataset.do]?.();
   };
+  const cancelShare = () => shareRequest?.abort();
+  dialog.addEventListener("close", cancelShare);
   root.addEventListener("click", onClick);
   function refreshLanguage() {
     document.documentElement.lang = locale;
@@ -245,6 +282,8 @@ export function mountBudget(root, live) {
   root.querySelectorAll("[data-icon]").forEach(el=>el.innerHTML=icon(el.dataset.icon));
   refreshLanguage();
   return () => {
+    cancelShare();
+    dialog.removeEventListener("close", cancelShare);
     agent.dispose();
     clearTimeout(toastTimer);
     root.removeEventListener("click", onClick);

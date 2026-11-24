@@ -20,7 +20,7 @@ test("localization formats GBP and translates only the original sample copy", ()
     assert.equal(itemText({...sample.basics[0],name:"Our rent"},"name"), "Our rent");
     assert.equal(itemText(custom,"name"), "Rent");
     const book = {...sample, extras:[custom]};
-    assert.match(letter(book), /^Hai Squeezy,/);
+    assert.match(letter(book), /^Hi Squeezy,/);
     assert.match(letter(book), /Rent.*My own words/);
     setLocale("en-GB");
     assert.match(letter(book), /^Hi Squeezy,/);

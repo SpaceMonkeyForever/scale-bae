@@ -159,3 +159,7 @@ textarea { min-height: 85px; resize: vertical; }.field-pair { display: grid; gri
   .hero h1 { letter-spacing: -.055em; }
   .stationery { transform: translateY(-50%) scale(.49); right: -3px; }
 }
+
+.currency-field { display: flex; align-items: center; gap: 8px; margin: 12px 0; font-size: 13px; color: #705e53; }
+.currency-field select { font: inherit; color: inherit; cursor: pointer; max-width: 70%; min-height: 36px; border: 1px solid #cdb99e; border-radius: 8px; padding: 4px 6px; background: #fff9ef; }
+#receipt-title { overflow-wrap: anywhere; }

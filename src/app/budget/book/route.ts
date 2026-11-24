@@ -9,6 +9,12 @@ export async function PUT(request:Request) {
   const parsed = change.safeParse(await input(request).catch(() => null));
   if (!parsed.success) return json(null,400);
   const {revision,budget} = parsed.data;
-  if (!writeBudget(user.userId,revision,budget)) return json(readBudget(user.userId),409);
+  // Older open tabs still interpret every amount as GBP.
+  if (!budget.currency) {
+    const current = readBudget(user.userId,user);
+    if (current.budget.currency !== "GBP") return json(current,409);
+    budget.currency = "GBP";
+  }
+  if (!writeBudget(user.userId,revision,budget)) return json(readBudget(user.userId,user),409);
   return json({revision:revision+1,budget});
 }

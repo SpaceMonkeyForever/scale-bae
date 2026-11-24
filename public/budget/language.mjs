@@ -1,4 +1,13 @@
 const indonesia = {
+  "Your earlier entries were shown in GBP. They now use IDR with the same numbers.": "Catatan sebelumnya ditampilkan dalam GBP. Sekarang mata uangnya IDR dengan angka yang sama.",
+  "Budget currency": "Mata uang anggaran",
+  "Change currency?": "Ganti mata uang?",
+  "Keep the same numbers in {currency}? For example, {before} becomes {after}. No exchange rate is applied.": "Tetap gunakan angka yang sama dalam {currency}? Misalnya, {before} menjadi {after}. Angka tidak dikonversi dengan kurs.",
+  "Change currency": "Ganti mata uang",
+  "Currency updated": "Mata uang diperbarui",
+  "Preparing your English message…": "Sedang menyiapkan pesan dalam bahasa Inggris…",
+  "Couldn’t prepare the English message. Please try again.": "Pesan dalam bahasa Inggris belum siap. Coba lagi.",
+  "Try again": "Coba lagi",
   "Progress": "Progres", "Scale Bae home": "Beranda Scale Bae",
   "Tell me how much Squeezy gave you, when it’s for, and which bills are paid or still due.": "Ceritakan berapa dana dari Squeezy, untuk periode kapan, dan tagihan mana yang sudah atau belum dibayar.",
   "Getting started": "Mulai di sini", "Set up your budget": "Atur anggaranmu", "allocated": "dana awal",
@@ -68,8 +77,8 @@ const indonesia = {
   "Edit a basic": "Ubah kebutuhan rutin", "Add a basic": "Tambah kebutuhan rutin",
   "Edit an extra": "Ubah pengeluaran tambahan", "Add an extra": "Tambah pengeluaran tambahan",
   "Edit a top-up": "Ubah tambahan dana", "Add a top-up": "Catat tambahan dana",
-  "Amount from this budget (£)": "Jumlah dari anggaran ini (£)", "Amount (£)": "Jumlah (£)",
-  "Use the cost for this whole period. Enter £0 if an earlier budget covered it.": "Masukkan biaya untuk seluruh periode ini. Isi £0 jika sudah ditanggung anggaran sebelumnya.",
+  "Amount from this budget ({currency})": "Jumlah dari anggaran ini ({currency})", "Amount ({currency})": "Jumlah ({currency})",
+  "Use the cost for this whole period. Enter {zero} if an earlier budget covered it.": "Masukkan biaya untuk seluruh periode ini. Isi {zero} jika sudah ditanggung anggaran sebelumnya.",
   "Keep the reason in your own words for Squeezy.": "Ceritakan alasannya ke Squeezy dengan kata-katamu sendiri.",
   "This is added to the original allocation.": "Jumlah ini akan ditambahkan ke anggaran awal.",
   "Basic": "Nama kebutuhan", "What was it?": "Uangnya untuk apa?", "Top-up note": "Catatan tambahan dana",
@@ -81,7 +90,7 @@ const indonesia = {
   "Remove “{name}” from this sample budget?": "Hapus “{name}” dari contoh anggaran ini?",
   "Keep entry": "Simpan catatan", "Remove entry": "Hapus catatan", "Entry removed": "Catatan dihapus",
   "Your allocation": "Anggaranmu", "The original amount and how long it needs to last.": "Jumlah dana awal dan periode penggunaannya.",
-  "Original amount (£)": "Jumlah awal (£)", "From": "Mulai", "Through": "Sampai", "Save allocation": "Simpan anggaran",
+  "Original amount ({currency})": "Jumlah awal ({currency})", "From": "Mulai", "Through": "Sampai", "Save allocation": "Simpan anggaran",
   "Allocation updated": "Anggaran diperbarui", "Original allocation": "Dana awal", "Basics for the period": "Kebutuhan rutin periode ini",
   "Top-up needed": "Dana tambahan yang dibutuhkan", "Left over": "Sisa dana",
   "Hi Squeezy,": "Hai Squeezy,", "Your budget update": "Kabar anggaranmu", "Read it through, then choose where to send it.": "Baca dulu pesannya, lalu pilih tempat untuk mengirimnya.",
@@ -108,15 +117,15 @@ const indonesia = {
   "Rent": "Sewa tempat tinggal", "Bike": "Sepeda", "Electricity": "Listrik", "Groceries": "Belanja dapur",
   "New bike tyre": "Ban sepeda baru", "My old one split on the way home.": "Ban lamaku sobek di jalan pulang.",
   "Pharmacy visit": "Obat dari apotek", "An unexpected prescription.": "Ada resep obat yang tidak terduga.",
-  "I spent £95 on a bike repair because my brakes stopped working.": "Aku habis 95 pound buat servis sepeda karena remnya rusak.",
+  "I spent {amount} on a bike repair because my brakes stopped working.": "Aku habis {amount} buat servis sepeda karena remnya rusak.",
   "I paid the electricity through 31 January 2027.": "Aku sudah bayar listrik sampai 31 Januari 2027.",
-  "Squeezy sent me another £100.": "Squeezy kirim tambahan 100 pound buatku."
+  "Squeezy sent me another {amount}.": "Squeezy kirim tambahan {amount} buatku."
 };
 export let locale = "en-GB";
 export function setLocale(value) { locale = value === "id-ID" ? "id-ID" : "en-GB"; }
 export { preferredLocale } from "./preference.mjs";
-export function t(source, values = {}) {
-  const text = locale === "id-ID" && Object.hasOwn(indonesia, source) ? indonesia[source] : source;
+export function t(source, values = {}, language = locale) {
+  const text = language === "id-ID" && Object.hasOwn(indonesia, source) ? indonesia[source] : source;
   return text.replace(/\{(\w+)\}/g, (match, key) => Object.hasOwn(values, key) ? values[key] : match);
 }
 

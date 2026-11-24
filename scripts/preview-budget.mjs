@@ -3,6 +3,8 @@ import { readFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 import { anthropicMessage, budgetTurn } from "./budget-agent.mjs";
 
+import { englishShare } from "./budget-share.mjs";
+
 // Only the public example and the two brand assets are served on loopback.
 const pages = new Map([
   ["/budget", ["../examples/budget/index.html", "text/html"]],
@@ -33,7 +35,7 @@ export function startPreview(sendMessage = anthropicMessage, port = Number(proce
         let input;
         try { input = JSON.parse(Buffer.concat(chunks).toString("utf8")); }
         catch { response.writeHead(400).end(); return; }
-        const result = await budgetTurn(input, sendMessage, signal);
+        const result = input.intent === "englishShare" ? await englishShare(input.budget, sendMessage, signal) : await budgetTurn(input, sendMessage, signal);
         response.writeHead(200, {"content-type":"application/json", "cache-control":"no-store"}).end(JSON.stringify(result));
       } catch (err) {
         response.writeHead(err.message === "Invalid turn" ? 400 : 502).end();
