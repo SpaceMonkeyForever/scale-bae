@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
+import { AchievementArt } from "@/components/features/achievements/achievement-art";
 import { motion, useReducedMotion } from "motion/react";
 import { cn, formatRelativeDate, weightChange } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -107,14 +107,12 @@ export function WeightList({ entries, achievements = [], onDelete }: WeightListP
               {dayAchievements.length > 0 && (
                 <div className="flex gap-1">
                   {dayAchievements.map((a) => (
-                    <Image
+                    <AchievementArt
                       key={a.type.id}
-                      src={a.type.image}
-                      alt={a.type.name}
+                      achievement={a.type}
                       title={a.type.name}
-                      width={24}
-                      height={24}
-                      className="rounded-full"
+                      size={24}
+                      className="overflow-hidden rounded-full"
                     />
                   ))}
                 </div>

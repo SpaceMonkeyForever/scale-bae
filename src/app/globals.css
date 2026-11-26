@@ -93,11 +93,6 @@
   75% { transform: rotate(5deg); }
 }
 
-@keyframes shine {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(200%); }
-}
-
 :root {
   --background: #f7f4fc;
   --foreground: #2c233a;

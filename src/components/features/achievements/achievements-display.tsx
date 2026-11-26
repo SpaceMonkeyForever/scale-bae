@@ -28,7 +28,7 @@ export function AchievementsDisplay({ unlockedAchievements }: AchievementsDispla
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-4 sm:grid-cols-7 gap-3">
+        <div className="grid grid-cols-4 sm:grid-cols-5 gap-3">
           {allAchievements.map((achievement) => (
             <AchievementBadge
               key={achievement.id}

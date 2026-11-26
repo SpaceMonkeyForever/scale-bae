@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { AchievementArt } from "./achievement-art";
 import { motion, AnimatePresence } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { UnlockedAchievement } from "@/lib/achievement-types";
@@ -44,13 +44,7 @@ export function AchievementUnlockedModal({
             transition={{ delay: 0.2, type: "spring", damping: 10 }}
             className="w-24 h-24 mx-auto mb-4 flex items-center justify-center bg-gradient-to-br from-lavender-200 to-bae-200 rounded-full border-4 border-lavender-300 shadow-lg overflow-hidden"
           >
-            <Image
-              src={achievement.type.image}
-              alt={achievement.type.name}
-              width={96}
-              height={96}
-              className="object-cover"
-            />
+            <AchievementArt achievement={achievement.type} size={96} />
           </motion.div>
 
           {/* Title */}

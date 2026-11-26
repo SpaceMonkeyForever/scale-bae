@@ -2,42 +2,17 @@ import { v4 as uuidv4 } from "uuid";
 import { getAchievementsByUserId, createAchievement, getWeightsByUserId } from "@/db/queries";
 import { ACHIEVEMENT_TYPES, UnlockedAchievement } from "./achievement-types";
 import { convertWeight } from "./utils";
+import { weighInMilestones } from "./achievement-streaks";
 
 // Re-export types for convenience
 export { ACHIEVEMENT_TYPES, type AchievementType, type UnlockedAchievement } from "./achievement-types";
-
-function hasConsecutiveDays(dates: Date[], requiredDays: number): boolean {
-  if (dates.length < requiredDays) return false;
-
-  // Sort dates descending (most recent first)
-  const sortedDates = [...dates].sort((a, b) => b.getTime() - a.getTime());
-
-  let streak = 1;
-  for (let i = 1; i < sortedDates.length && streak < requiredDays; i++) {
-    const prevDate = sortedDates[i - 1];
-    const currDate = sortedDates[i];
-
-    // Check if dates are on consecutive days
-    const diffDays = Math.floor(
-      (prevDate.getTime() - currDate.getTime()) / (1000 * 60 * 60 * 24)
-    );
-
-    if (diffDays === 1) {
-      streak++;
-    } else if (diffDays > 1) {
-      streak = 1; // Reset streak
-    }
-    // diffDays === 0 means same day, don't count but continue
-  }
-
-  return streak >= requiredDays;
-}
 
 export async function checkForNewAchievements(
   userId: string,
   newWeight: number,
   unit: "lb" | "kg",
-  goalWeight: number | null
+  goalWeight: number | null,
+  timeZone = "UTC"
 ): Promise<UnlockedAchievement[]> {
   const existingAchievements = await getAchievementsByUserId(userId);
   const existingTypes = new Set(existingAchievements.map((a) => a.type));
@@ -52,11 +27,12 @@ export async function checkForNewAchievements(
     const type = ACHIEVEMENT_TYPES[typeId];
     if (!type) return false;
 
-    await createAchievement({
+    const created = await createAchievement({
       id: uuidv4(),
       userId,
       type: typeId,
     });
+    if (!created) return false;
 
     newAchievements.push({
       type,
@@ -79,11 +55,11 @@ export async function checkForNewAchievements(
     await tryUnlock("entries_30");
   }
 
-  // Check: 7-day streak
-  const dates = weights.map((w) => new Date(w.recordedAt));
-  if (hasConsecutiveDays(dates, 7)) {
-    await tryUnlock("streak_7");
+  const { longestStreak, hasComeback } = weighInMilestones(weights.map(w => w.recordedAt), timeZone);
+  for (const days of [7, 14, 30]) {
+    if (longestStreak >= days) await tryUnlock(`streak_${days}`);
   }
+  if (hasComeback) await tryUnlock("comeback");
 
   // Check: Goal reached
   if (goalWeight && newWeight <= goalWeight) {

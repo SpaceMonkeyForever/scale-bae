@@ -1,8 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { AchievementType } from "@/lib/achievement-types";
+import { AchievementArt } from "./achievement-art";
 
 interface AchievementBadgeProps {
   achievement: AchievementType;
@@ -39,20 +39,7 @@ export function AchievementBadge({
         )}
         title={unlocked ? `Unlocked: ${achievement.description}` : `Locked: ${achievement.description}`}
       >
-        <Image
-          src={achievement.image}
-          alt={achievement.name}
-          width={imageSize}
-          height={imageSize}
-          className={cn("object-cover", !unlocked && "opacity-50")}
-        />
-        {/* Shine effect for unlocked badges */}
-        {unlocked && (
-          <div
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-[shine_3s_ease-in-out_infinite]"
-            aria-hidden="true"
-          />
-        )}
+        <AchievementArt achievement={achievement} size={imageSize} />
       </div>
       <span
         className={cn(

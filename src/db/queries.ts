@@ -87,7 +87,14 @@ export async function getAchievementsByUserId(userId: string) {
 }
 
 export async function createAchievement(achievement: NewAchievement) {
-  return db.insert(achievements).values(achievement).returning();
+  return db.transaction(tx => {
+    const existing = tx.select({ id: achievements.id }).from(achievements).where(and(
+      eq(achievements.userId, achievement.userId), eq(achievements.type, achievement.type)
+    )).get();
+    if (existing) return false;
+    tx.insert(achievements).values(achievement).run();
+    return true;
+  }, { behavior: "immediate" });
 }
 
 // Activity log queries

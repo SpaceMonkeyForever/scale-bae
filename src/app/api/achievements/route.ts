@@ -35,7 +35,8 @@ export async function POST(request: Request) {
     session.userId,
     weight,
     unit,
-    goalWeight ?? null
+    goalWeight ?? null,
+    typeof body.timeZone === "string" ? body.timeZone : "UTC"
   );
 
   return NextResponse.json({

@@ -134,6 +134,7 @@ export default function ConfirmPage() {
           weight: pendingWeight.weight,
           unit: pendingWeight.unit,
           goalWeight,
+          timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         }),
       });
       const achievementsData = await achievementsRes.json();
